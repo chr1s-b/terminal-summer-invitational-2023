@@ -16,23 +16,24 @@ class Utilities:
 
         # Used to compare difference between the previous game state and the current one
         self.prev_game_map = None
-        self.destroyed_walls = []
+        self.destroyed_structures = {WALL: [], SUPPORT: [], TURRET: []}
         return
 
-    def track_destroyed_walls(self, game_state):
+    def track_destroyed_structures(self, game_state):
         """Tracks walls that have been destroyed in the recent turn."""
         if self.prev_game_map:
-            for location in game_state.game_map:
-                if len(self.prev_game_map[location]) == 0 :
-                    continue
+            for structure in [WALL, SUPPORT, TURRET]:
+                for location in game_state.game_map:
+                    if len(self.prev_game_map[location]) == 0 :
+                        continue
 
-                prev_unit = self.prev_game_map[location][0]     
+                    prev_unit = self.prev_game_map[location][0]     
 
-                if prev_unit.player_index == 0 and len(game_state.game_map[location]) == 0 and prev_unit.unit_type == WALL:
-                    self.destroyed_walls.append(location)
+                    if prev_unit.player_index == 0 and len(game_state.game_map[location]) == 0 and prev_unit.unit_type == structure:
+                        self.destroyed_structures[structure].append(location)
 
         self.prev_game_map = game_state.game_map
-        return self.destroyed_walls
+        return self.destroyed_structures
 
     def enemy_balance(self, game_state):
         """Get enemy balance of MP and SP."""

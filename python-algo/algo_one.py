@@ -65,8 +65,8 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
-        self.utilities.track_destroyed_walls(game_state)
-        gamelib.debug_write('Destroyed walls: {}'.format(self.utilities.destroyed_walls))
+        self.utilities.track_destroyed_structures(game_state)
+        gamelib.debug_write('Destroyed walls: {}'.format(self.utilities.destroyed_structures))
         self.starter_strategy(game_state)
 
         game_state.submit_turn()
@@ -79,7 +79,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
 
     def starter_strategy(self, game_state):
         enemy_sp, enemy_mp = self.utilities.enemy_balance(game_state)
-        destroyed_walls = self.utilities.destroyed_walls
+        destroyed_structures = self.utilities.destroyed_structures
 
         # only try to build the opening if the opening has not been completed yet
         if not self.five_turret_complete:
@@ -97,7 +97,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         self.defenses.advance_phase(game_state)
 
         # not sure about the below
-        priority_walls = destroyed_walls + []
+        priority_walls = destroyed_structures[WALL] + []
         upgradeable_turrets = []
         new_turrets = []
         new_walls = []
