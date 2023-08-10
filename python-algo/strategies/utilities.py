@@ -14,13 +14,29 @@ class Utilities:
         MP = 1
         SP = 0
 
+        # Used to compare difference between the previous game state and the current one
+        self.prev_game_map = None
         self.destroyed_walls = []
         return
 
     def track_destroyed_walls(self, game_state):
         """Tracks walls that have been destroyed in the recent turn."""
-        # TODO
-        return []
+        if self.prev_game_map:
+            for location in game_state.game_map:
+                if len(self.prev_game_map[location]) == 0 :
+                    continue
+
+                prev_unit = self.prev_game_map[location][0]     
+
+                if prev_unit.player_index == 0 and len(game_state.game_map[location]) == 0 and prev_unit.unit_type == WALL:
+                    self.destroyed_walls.append(location)
+
+        self.prev_game_map = game_state.game_map
+        return self.destroyed_walls
+
+    def enemy_balance(self, game_state):
+        """Get enemy balance of MP and SP."""
+        return [game_state.get_resource(SP, player_index=1), game_state.get_resource(MP, player_index=1)]
 
     def detect_enemy_unit(self, game_state, unit_type=None, valid_x=None, valid_y=None):
         total_units = 0

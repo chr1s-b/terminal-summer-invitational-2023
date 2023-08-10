@@ -65,8 +65,8 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
-        self.utilities.track_enemy_spending(game_state)
         self.utilities.track_destroyed_walls(game_state)
+        gamelib.debug_write('Destroyed walls: {}'.format(self.utilities.destroyed_walls))
         self.starter_strategy(game_state)
 
         game_state.submit_turn()
@@ -78,7 +78,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
     """
 
     def starter_strategy(self, game_state):
-        enemy_sp, enemy_mp = self.utilities.enemy_balance
+        enemy_sp, enemy_mp = self.utilities.enemy_balance(game_state)
         destroyed_walls = self.utilities.destroyed_walls
 
         # only try to build the opening if the opening has not been completed yet
