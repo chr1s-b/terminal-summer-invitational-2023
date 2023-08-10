@@ -13,4 +13,5 @@ class Defenses:
         INTERCEPTOR = config["unitInformation"][5]["shorthand"]
         MP = 1
         SP = 0
+        self.scored_on_locations = []
         return

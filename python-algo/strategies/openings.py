@@ -40,7 +40,7 @@ class Openings:
         turret_positions += [[21, 11]]
         wall_positions += [[21, 12], [22, 12]]
         game_state.attempt_spawn(TURRET, turret_positions)
-        game_state.attempt_spawn(wall_positions)
+        game_state.attempt_spawn(WALL, wall_positions)
 
         # expected turn 5
         upgrade_turret_positions += [[21, 11]]

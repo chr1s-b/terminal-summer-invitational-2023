@@ -17,6 +17,7 @@ class Utilities:
         # enemy balances
         self.enemy_mp = 40
         self.enemy_sp = 5
+        self.destroyed_walls = []
         return
 
     def track_destroyed_walls(self, game_state):
