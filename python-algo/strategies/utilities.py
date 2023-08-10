@@ -14,9 +14,6 @@ class Utilities:
         MP = 1
         SP = 0
 
-        # enemy balances
-        self.enemy_mp = 40
-        self.enemy_sp = 5
         self.destroyed_walls = []
         return
 
@@ -24,16 +21,6 @@ class Utilities:
         """Tracks walls that have been destroyed in the recent turn."""
         # TODO
         return []
-
-    def track_enemy_spending(self, game_state):
-        """Tracks enemy spending of MP and SP. Must call each turn."""
-        # TODO
-        return self.enemy_balance
-
-    @property
-    def enemy_balance(self):
-        """Get enemy balance of MP and SP."""
-        return [self.enemy_sp, self.enemy_mp]
 
     def detect_enemy_unit(self, game_state, unit_type=None, valid_x=None, valid_y=None):
         total_units = 0
