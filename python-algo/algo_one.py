@@ -92,6 +92,10 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         # middle/late game
         # TODO implement
 
+        # defence
+        # try to move to the next phase according to doc
+        self.defenses.advance_phase(game_state)
+
         # not sure about the below
         priority_walls = destroyed_walls + []
         upgradeable_turrets = []
