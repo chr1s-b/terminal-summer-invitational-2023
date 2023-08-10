@@ -48,6 +48,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.attacks = strategies.Attacks(config)
         self.openings = strategies.Openings(config)
         self.utilities = strategies.Utilities(config)
+
+        self.five_turret_complete = False
+
         self.scored_on_locations = []
 
     def on_turn(self, turn_state):
@@ -62,6 +65,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
+        self.utilities.track_enemy_spending(game_state)
+        self.utilities.track_destroyed_walls(game_state)
         self.starter_strategy(game_state)
 
         game_state.submit_turn()
@@ -73,39 +78,31 @@ class AlgoStrategy(gamelib.AlgoCore):
     """
 
     def starter_strategy(self, game_state):
-        """
-        For defense we will use a spread out layout and some interceptors early on.
-        We will place turrets near locations the opponent managed to score on.
-        For offense we will use long range demolishers if they place stationary units near the enemy's front.
-        If there are no stationary units to attack in the front, we will send Scouts to try and score quickly.
-        """
-        # First, place basic defenses
-        self.defenses.build_defences(game_state)
-        # Now build reactive defenses based on where the enemy scored
-        self.defenses.build_reactive_defense(game_state)
+        enemy_sp, enemy_mp = self.utilities.enemy_balance
+        destroyed_walls = self.utilities.destroyed_walls
 
-        # If the turn is less than 5, stall with interceptors and wait to see enemy's base
-        if game_state.turn_number < 5:
-            self.defenses.stall_with_interceptors(game_state)
-        else:
-            # Now let's analyze the enemy base to see where their defenses are concentrated.
-            # If they have many units in the front we can build a line for our demolishers to attack them at long range.
-            if self.detect_enemy_unit(game_state, unit_type=None, valid_x=None, valid_y=[14, 15]) > 10:
-                self.attacks.demolisher_line_strategy(game_state)
-            else:
-                # They don't have many units in the front so lets figure out their least defended area and send Scouts there.
+        # only try to build the opening if the opening has not been completed yet
+        if not self.five_turret_complete:
+            self.five_turret_complete = self.openings.five_turret(game_state)
+            # TODO send mobile units
+            return
 
-                # Only spawn Scouts every other turn
-                # Sending more at once is better since attacks can only hit a single scout at a time
-                if game_state.turn_number % 2 == 1:
-                    # To simplify we will just check sending them from back left and right
-                    scout_spawn_location_options = [[13, 0], [14, 0]]
-                    best_location = self.utilities.least_damage_spawn_location(game_state, scout_spawn_location_options)
-                    game_state.attempt_spawn(SCOUT, best_location, 1000)
+        # maintain opening
 
-                # Lastly, if we have spare SP, let's build some supports
-                support_locations = [[13, 2], [14, 2], [13, 3], [14, 3]]
-                game_state.attempt_spawn(SUPPORT, support_locations)
+        # middle/late game
+        # TODO implement
+
+        # not sure about the below
+        priority_walls = destroyed_walls + []
+        upgradeable_turrets = []
+        new_turrets = []
+        new_walls = []
+
+        game_state.attempt_spawn(priority_walls)
+        game_state.attempt_upgrade(upgradeable_turrets)
+        game_state.attempt_spawn(new_turrets)
+        game_state.attempt_upgrade(new_turrets)
+        game_state.attempt_spawn(new_walls)
 
 
 if __name__ == "__main__":
