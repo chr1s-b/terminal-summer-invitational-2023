@@ -1,3 +1,4 @@
+from algo_one import AlgoStrategyOne
 import gamelib
 import random
 import math
@@ -234,5 +235,5 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
 if __name__ == "__main__":
-    algo = AlgoStrategy()
+    algo = AlgoStrategyOne()
     algo.start()

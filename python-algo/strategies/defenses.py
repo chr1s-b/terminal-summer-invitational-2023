@@ -14,6 +14,7 @@ class Defenses:
         INTERCEPTOR = config["unitInformation"][5]["shorthand"]
         MP = 1
         SP = 0
+        self.scored_on_locations = []
         return
 
     def build_defences(self, game_state):
@@ -68,3 +69,10 @@ class Defenses:
             We don't have to remove the location since multiple mobile 
             units can occupy the same space.
             """
+    
+    def filter_blocked_locations(self, locations, game_state):
+        filtered = []
+        for location in locations:
+            if not game_state.contains_stationary_unit(location):
+                filtered.append(location)
+        return filtered

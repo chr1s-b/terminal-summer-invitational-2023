@@ -21,7 +21,7 @@ Advanced strategy tips:
 """
 
 
-class AlgoStrategy(gamelib.AlgoCore):
+class AlgoStrategyOne(gamelib.AlgoCore):
     def __init__(self):
         super().__init__()
         seed = random.randrange(maxsize)
@@ -103,8 +103,3 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.attempt_spawn(new_turrets)
         game_state.attempt_upgrade(new_turrets)
         game_state.attempt_spawn(new_walls)
-
-
-if __name__ == "__main__":
-    algo = AlgoStrategy()
-    algo.start()
