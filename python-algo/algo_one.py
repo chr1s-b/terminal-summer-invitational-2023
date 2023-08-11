@@ -90,11 +90,10 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         # maintain opening
 
         # middle/late game
-        # TODO implement
 
         # defence
         # try to move to the next phase according to doc
-        self.defenses.advance_phase(game_state)
+        self.defenses.build_midgame_defenses(game_state)
 
         # not sure about the below
         priority_walls = destroyed_structures[WALL] + []
