@@ -27,13 +27,16 @@ class Openings:
         game_state.attempt_spawn(WALL, wall_positions)
         game_state.attempt_upgrade(upgrade_turret_positions)
 
+        if(game_state.turn_number == 0):
+            return
+
         # expected turn 2
         upgrade_turret_positions += [[18, 9]]
         game_state.attempt_upgrade(upgrade_turret_positions)
 
         # expected turn 2/3
         # ? do the walls get spawned in list-order priority?
-        wall_positions += [[7, 12], [7, 11], [7, 10], [8, 9], [26, 13], [27, 13]]
+        wall_positions += [[7, 12], [7, 11], [7, 10], [8, 9], [26, 13], [27, 13], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
         game_state.attempt_spawn(WALL, wall_positions)
 
         # expected turn 4
@@ -44,7 +47,7 @@ class Openings:
 
         # expected turn 5
         upgrade_turret_positions += [[21, 11]]
-        wall_positions += [[20, 11], [19, 10]]
+        wall_positions += [[20, 11], [19, 10], [22, 14]]
         wall_positions += [[x, 8] for x in range(9, 17)]
         game_state.attempt_upgrade(upgrade_turret_positions)
         game_state.attempt_spawn(WALL, wall_positions)

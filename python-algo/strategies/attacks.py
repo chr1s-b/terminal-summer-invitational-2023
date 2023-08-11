@@ -49,8 +49,8 @@ class Attacks:
             damage = 0
             for path_location in path:
                 # Get number of enemy turrets that can attack each location and multiply by turret damage
-                for unit in game_state.get_attackers(path_location, 0)
-                    if unit.get('attackRange',0) > 3.5: #seeing if upgraded or not
+                for unit in game_state.get_attackers(path_location, 0):
+                    if unit.get('attackRange', 0) > 3.5: # seeing if upgraded or not
                         damage += 20
                     else:
                         damage += 8
@@ -66,7 +66,7 @@ class Attacks:
             damage = 0
             for path_location in path:
                 # Get number of enemy turrets that can attack each location and multiply by turret damage
-                for unit in game_state.get_attackers(path_location, 1)
+                for unit in game_state.get_attackers(path_location, 1):
                     if unit.get('attackRange',0) > 3.5: #seeing if upgraded or not
                         damage += 20
                     else:
