@@ -150,12 +150,12 @@ class Attacks:
             max_shielding = max([enemy_shielding_map[enemy_path_location[0]][enemy_path_location[1]] for enemy_path_location in enemy_path_locations])
 
             total_health = numPosEnemyAttackers * (20 + max_shielding)
-            if minDamage_left < total_health:
+            if minDamage_left <= minDamage_right and minDamage_left < total_health:
                 # Gamble and send half to conserve mobile points
-                numDeploy = math.floor((total_health - minDamage_left) / 6 / 4)
+                numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
                 interceptors[0] = [numDeploy, SpawnPoint3]
-            if minDamage_right < total_health:
-                numDeploy = math.floor((total_health - minDamage_right) / 6 / 4) 
+            if minDamage_right < minDamage_left and minDamage_right < total_health:
+                numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                 interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
 
