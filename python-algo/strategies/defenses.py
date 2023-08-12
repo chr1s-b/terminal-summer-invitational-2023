@@ -51,7 +51,8 @@ class Defenses:
         # phase 6
         wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],
                           [24, 11], [23, 10], [22, 9], [21, 8]]
-        phases.append([(UPGRADE, u_pos) for u_pos in [[25, 13], [26, 13], [27, 13]]] + [(WALL, w_pos) for w_pos in wall_positions])
+        wall_ugprades = [[25, 13], [26, 13], [27, 13], [0, 13], [1, 13], [2, 13]]
+        phases.append([(UPGRADE, u_pos) for u_pos in wall_ugprades] + [(WALL, w_pos) for w_pos in wall_positions])
 
         completed = self.build_phases(game_state, phases)
         return completed
