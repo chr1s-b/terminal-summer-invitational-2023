@@ -71,7 +71,7 @@ class Attacks:
                         sent_destroyers = True
                     else:
                         self.scout_demo_combo(game_state)
-                        sent_destroyers = False    
+                        sent_destroyers = False
 
     def least_damage_path(self, game_state, location_options):
         damages = []
@@ -174,7 +174,7 @@ class Attacks:
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
-        listicle = self.least_damage_path(game_state, spawnLoc)
+        listicle = self.least_damage_path(game_state, [spawnLoc])
         return [listicle[0], listicle[1]]
 
     def where_spawn_dest(self, game_state):
@@ -185,8 +185,8 @@ class Attacks:
         return SpawnPoint1
 
     def simul_remove_mid(self, game_state_copy):
-        self.game_state_copy.remove_unit([9,8])
-        listicle = self.least_damage_path(game_state_copy, SpawnPoint2)
+        game_state_copy.attempt_remove([9, 8])
+        listicle = self.least_damage_path(game_state_copy, [SpawnPoint2])
         return listicle[1]
 
     def scout_demo_combo(self, game_state):
