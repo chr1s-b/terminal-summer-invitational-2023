@@ -147,7 +147,7 @@ class Attacks:
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
-        if self.get_resource(MP, 0) >= 12:
+        if game_state.get_resource(MP, 0) >= 12:
             game_state.attempt_spawn(DEMOLISHER, spawnLoc, 7)
 
     def where_spawn_dest(self, game_state):
