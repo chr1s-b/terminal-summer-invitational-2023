@@ -50,6 +50,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         self.utilities = strategies.Utilities(config)
 
         self.five_turret_complete = False
+        self.strat_phase = 0
 
         self.scored_on_locations = []
 
@@ -78,14 +79,17 @@ class AlgoStrategyOne(gamelib.AlgoCore):
     """
 
     def starter_strategy(self, game_state):
-        enemy_sp, enemy_mp = self.utilities.enemy_balance(game_state)
         destroyed_structures = self.utilities.destroyed_structures
 
         # only try to build the opening if the opening has not been completed yet
         if not self.five_turret_complete:
             self.five_turret_complete = self.openings.five_turret(game_state)
             # TODO send mobile units
-            return  
+
+        self.attacks.attack(game_state, self.strat_phase)
+
+        return
+        
         
 
         # maintain opening

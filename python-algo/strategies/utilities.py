@@ -1,6 +1,5 @@
 import gamelib
 
-
 class Utilities:
     def __init__(self, config):
         self.config = config
@@ -34,10 +33,6 @@ class Utilities:
 
         self.prev_game_map = game_state.game_map
         return self.destroyed_structures
-
-    def enemy_balance(self, game_state):
-        """Get enemy balance of MP and SP."""
-        return [game_state.get_resource(SP, player_index=1), game_state.get_resource(MP, player_index=1)]
 
     def detect_enemy_unit(self, game_state, unit_type=None, valid_x=None, valid_y=None):
         total_units = 0

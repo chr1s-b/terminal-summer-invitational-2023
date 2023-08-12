@@ -1,5 +1,5 @@
 import gamelib
-
+import math
 
 class Attacks:
     def __init__(self, config):
@@ -22,9 +22,13 @@ class Attacks:
         return
 
     def attack(self, game_state, strat_phase):
+        # TODO: Replace this
+        middleStillOpen = 1
+
         if game_state.turn_number == 1:
             game_state.attempt_spawn(SCOUT, [14, 0], 1)
             game_state.attempt_spawn(SCOUT, [6, 7], 3)
+        
         if strat_phase < middleStillOpen:
             interceptors = self.spawn_intercept(game_state)
             depRight = interceptors[0]
@@ -50,7 +54,7 @@ class Attacks:
             for path_location in path:
                 # Get number of enemy turrets that can attack each location and multiply by turret damage
                 for unit in game_state.get_attackers(path_location, 0):
-                    if unit.get('attackRange', 0) > 3.5: # seeing if upgraded or not
+                    if unit.attackRange > 3.5: # seeing if upgraded or not
                         damage += 20
                     else:
                         damage += 8
@@ -67,7 +71,7 @@ class Attacks:
             for path_location in path:
                 # Get number of enemy turrets that can attack each location and multiply by turret damage
                 for unit in game_state.get_attackers(path_location, 1):
-                    if unit.get('attackRange',0) > 3.5: #seeing if upgraded or not
+                    if unit.attackRange > 3.5: #seeing if upgraded or not
                         damage += 20
                     else:
                         damage += 8
@@ -82,7 +86,7 @@ class Attacks:
         listicle = self.least_damage_path(game_state, deploy_locations)
         best_location = listicle[0]
         minDamage = listicle[1]
-        numScouts = game_state.get_resource(MP)
+        numScouts = int(game_state.get_resource(MP))
         totalScoutHealth = numScouts * 20
         if totalScoutHealth > minDamage:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
@@ -94,10 +98,27 @@ class Attacks:
               filtered.append(location)
         return filtered
     
+    def calculate_maximum_shielding(self, game_state):
+        grid = [[0 for _ in range(0, game_state.game_map.ARENA_SIZE)] for _ in range(0, game_state.game_map.ARENA_SIZE)]
+        for location in game_state.game_map:
+            if len(game_state.game_map[location]) != 0 and game_state.game_map[location][0].unit_type == SUPPORT:
+                support_unit = game_state.game_map[location][0]
+                # Get y position relative to enemy
+                shield_strength = support_unit.shieldPerUnit + support_unit.shieldBonusPerY * (27 - support_unit.y)
+                shield_range = support_unit.shieldRange
+                for shield_location in game_state.game_map.get_locations_in_range(location, shield_range):
+                    grid[shield_location[0]][shield_location[1]] += shield_strength
+
+        return max(map(max, grid))
+
     def spawn_intercept(self, game_state):
+        # TODO: Change this
+        middleIsOpen = True
+        max_shielding = self.calculate_maximum_shielding(game_state)
+
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
-        numPosEnemyAttackers = self.get_resource(MP, 1)
+        numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
         if numPosEnemyAttackers > 8:
             enemy_edges_right = game_state.game_map.get_edge_locations(game_state.game_map.TOP_RIGHT)
             enemy_edges_left = game_state.game_map.get_edge_locations(game_state.game_map.TOP_LEFT)
@@ -109,11 +130,11 @@ class Attacks:
             minDamage_right = enemy_path_right[1]
             best_location_left = enemy_path_left[0]
             minDamage_left = enemy_path_left[1]
-            total_health = numPosEnemyAttackers * 20
-            if minDamage_left > total_health:
+            total_health = numPosEnemyAttackers * 20 + max_shielding
+            if minDamage_left < total_health:
                 numDeploy = math.ceil(total_health - minDamage_left / 6)
                 interceptors[0] = [numDeploy, SpawnPoint3]
-            if minDamage_right > total_health:
+            if minDamage_right < total_health:
                 numDeploy = math.ceil(total_health - minDamage_right / 6)
                 interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
