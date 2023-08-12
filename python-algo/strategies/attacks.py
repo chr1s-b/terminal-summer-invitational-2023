@@ -17,16 +17,19 @@ class Attacks:
         global SpawnPoint1, SpawnPoint2, SpawnPoint3, SpawnPoint4
         # change these, will be one higher spawn point and one lower spawn point / side
         SpawnPoint1 = [2, 11] #high-left
-        SpawnPoint2 = [8, 5] #low-left
+        SpawnPoint2 = [7, 6] #low-left
         SpawnPoint3 = [21, 7] #high-right
         SpawnPoint4 = [17, 3] #low-right
+        global sent_destroyers, turn_remove_mid
+        sent_destroyers = False
+        turn_remove_mid = -1
         return
 
     def attack(self, game_state, strat_phase):
         # TODO: Replace this
         middleStillOpen = 5
-
-        if game_state.turn_number == 1:
+        numMP = math.floor(game_state.get_resource(MP))
+        if game_state.turn_number == 0:
             game_state.attempt_spawn(SCOUT, [14, 0], 1)
             game_state.attempt_spawn(SCOUT, [6, 7], 3)
 
@@ -35,16 +38,40 @@ class Attacks:
             depRight = interceptors[0]
             depLeft = interceptors[1]
             if depLeft[0] != 0:
-                game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
+                if numMP - depLeft[0] * 2 >= 2:
+                    game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
+                else:
+                    game_state.attempt_spawn(INTERCEPTOR, depLeft[1], 1)
             if depRight[0] != 0:
                 game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
             self.early_scouts(game_state)
+            
         if strat_phase > middleStillOpen:
-            # need way to determine which attack will be most effective, if can spawn reasonable #, if nothing on right, comparing lowest damage
-            self.send_boosted_destroyers(game_state)
-            #self.scout_demo_combo(game_state)
-            #game_state_copy = game_state
-            #self.simul_remove_mid(game_state_copy)
+            global turn_remove_mid
+            global sent_destroyers
+            if turn_remove_mid == game_state.turn_number:
+                game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+            else:
+                gauntletList = self.send_boosted_destroyers(game_state)
+                damageGauntlet = gauntletList[1]
+                gauntletSpawn = gauntletList[0]
+                game_state_copy = game_state
+                damageMid = self.simul_remove_mid(game_state_copy)
+                
+                if game_state.turn_number > 15 and damageMid < damageGauntlet and numMP >= 12:
+                    game_state.attempt_remove([9,8])
+                    turn_remove_mid = game_state.turn_number + 1
+                else:
+                    # send scout + demo combo round after sending destroyers, then revert
+                        # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
+                    if not sent_destoyers:
+                        game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)    
+                        sent_destroyers = True
+                    else:
+                        self.scout_demo_combo(game_state)
+                        sent_destroyers = False
+            
+            
 
     def least_damage_path(self, game_state, location_options):
         damages = []
@@ -120,7 +147,7 @@ class Attacks:
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
         numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
-        if numPosEnemyAttackers > 8:
+        if numPosEnemyAttackers >= 8:
             enemy_edges_right = game_state.game_map.get_edge_locations(game_state.game_map.TOP_RIGHT)
             enemy_edges_left = game_state.game_map.get_edge_locations(game_state.game_map.TOP_LEFT)
             deploy_locations_right = self.filter_blocked_locations(enemy_edges_right, game_state)
@@ -147,24 +174,22 @@ class Attacks:
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
-        if game_state.get_resource(MP, 0) >= 12:
-            game_state.attempt_spawn(DEMOLISHER, spawnLoc, 7)
+        listicle = self.least_damage_path(game_state_copy, spawnLoc)
+        return [listicle[0], listicle[1]]
 
     def where_spawn_dest(self, game_state):
-        spawn_locs = [SpawnPoint1, [3, 11], [4, 11], [5, 11]]
-        numAttackers = 0
+        spawn_locs = [SpawnPoint1, [3, 11], [4, 11]]
         for location in spawn_locs:
-            numAttackers += len(game_state.get_attackers(location, 0))
-        if numAttackers != 0:
-            return SpawnPoint2
-        else:
-            return SpawnPoint1
+            if len(game_state.get_attackers(location, 0)) > 0:
+                return SpawnPoint2
+        return SpawnPoint1
 
- #   def simul_remove_mid(self, game_state):
- #       pass
-        # gets passed the game state copy, changes it to simul removing a mid piece and attacking
-   # if self.contains_stationary_unit([x,y]):
-            #            self.game_map[x,y][0].pending_removal = True
-
-#    def scout_demo_combo(self, game_state):
- #       pass
+    def simul_remove_mid(self, game_state_copy):
+        self.game_state_copy.remove_unit([9,8])
+        listicle = self.least_damage_path(game_state_copy, SpawnPoint2)
+        return listicle[1]
+        
+    def scout_demo_combo(self, game_state):
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 1)
+        spawnLoc = self.where_spawn_dest(game_state)
+        game_state.attempt_spawn(SCOUT, spawnLoc, 1)
