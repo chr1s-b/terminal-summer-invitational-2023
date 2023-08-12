@@ -22,74 +22,61 @@ class Defenses:
     def five_turret(self, game_state):
         """Builds opening state with four turrets and five walls."""
 
-        # turn 1
+        phases = []
+
+        # phase 1
         turret_positions = [[3, 12], [6, 12], [25, 12], [18, 9]]
         wall_positions = [[3, 13], [6, 13], [25, 13], [17, 9], [18, 10]]
         upgrade_turret_positions = [[3, 12], [6, 12], [25, 12]]
         turrets = [(TURRET, t_pos) for t_pos in turret_positions]
         walls = [(WALL, w_pos) for w_pos in wall_positions]
         upgrades = [(UPGRADE, u_pos) for u_pos in upgrade_turret_positions]
-        phase_1 = turrets + walls + upgrades
-        if not self.build_phase(game_state, phase_1):
-            return 0
+        phases.append(turrets + walls + upgrades)
 
-        if (game_state.turn_number == 0):
-            return 1
+        # phase 2
+        phases.append([(UPGRADE, [18, 9])])
 
-        # expected turn 2
-        phase_2 = [(UPGRADE, [18, 9])]
-        if not self.build_phase(game_state, phase_2):
-            return 1
-
-        # expected turn 2/3
-        # ? do the walls get spawned in list-order priority?
+        # phase 3
         wall_positions = [[7, 12], [7, 11], [7, 10], [8, 9], [26, 13], [27, 13], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
-        phase_3 = [(WALL, w_pos) for w_pos in wall_positions]
-        if not self.build_phase(game_state, phase_3):
-            return 2
+        phases.append([(WALL, w_pos) for w_pos in wall_positions])
 
-        # expected turn 4
-        phase_4 = [(TURRET, [21, 11]), (WALL, [21, 12]), (WALL, [22, 12])]
-        if not self.build_phase(game_state, phase_4):
-            return 3
+        # phase 4
+        phases.append([(TURRET, [21, 11]), (WALL, [21, 12]), (WALL, [22, 12])])
 
-        # expected turn 5
+        # phase 5
         wall_positions = [[20, 11], [19, 10]] + [[x, 8] for x in range(16, 8, -1)]
-        phase_5 = [(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions]
-        if not self.build_phase(game_state, phase_5):
-            return 4
+        phases.append([(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions])
 
+        # phase 6
         wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],
                           [24, 11], [23, 10], [22, 9], [21, 8]]
-        phase_6 = [(WALL, w_pos) for w_pos in wall_positions]
-        if not self.build_phase(game_state, phase_6):
-            return 5
+        phases.append([(WALL, w_pos) for w_pos in wall_positions])
 
-        return 6
+        completed = self.build_phases(game_state, phases)
+        return completed
 
     def build_midgame_defenses(self, game_state):
         """Upgrade and maintain defences in the mid-game."""
         # currently quits when it fails to complete a phase
 
+        phases = []
+
         # phase 0 corresponds to opening complete
         # phase 1 adds a turret on left
-        if not self.build_phase(game_state, [(TURRET, [1, 12])]):
-            return 0
+        phases.append([(TURRET, [1, 12])])
 
         # phase 2 upgrades left turret, adds walls
         wall_positions = [[2, 12], [4, 12], [5, 12], [22, 12]]
-        if not self.build_phase(game_state, [(UPGRADE, [1, 12])] + [(WALL, pos) for pos in wall_positions]):
-            return 1
+        phases.append([(UPGRADE, [1, 12])] + [(WALL, pos) for pos in wall_positions])
 
         # phase 3 adds a turret on the right, upgrades turret
-        if not self.build_phase(game_state, [(TURRET, [25, 11]), (UPGRADE, [25, 11])]):
-            return 2
+        phases.append(game_state, [(TURRET, [25, 11]), (UPGRADE, [25, 11])])
 
         # phase 4 adds a turret on mid right, upgrade turret
-        if not self.build_phase(game_state, [(TURRET, [20, 10]), (UPGRADE, [20, 10])]):
-            return 3
+        phases.append(game_state, [(TURRET, [20, 10]), (UPGRADE, [20, 10])])
 
-        return 4
+        completed = self.build_phases(game_state, phases)
+        return completed
 
     def build_phase(self, game_state, phase):
         """Build phase and return whether complete."""
@@ -109,3 +96,11 @@ class Defenses:
                     complete = False
         gamelib.debug_write(f'build_phase returns complete={complete}')
         return complete
+
+    def build_phases(self, game_state, phases):
+        """Build multiple phases and return how many are complete."""
+        for i, phase in enumerate(phases):
+            isComplete = self.build_phase(game_state, phase)
+            if not isComplete:
+                return i
+        return len(phases)
