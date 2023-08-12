@@ -70,10 +70,10 @@ class Defenses:
         phases.append([(UPGRADE, [1, 12])] + [(WALL, pos) for pos in wall_positions])
 
         # phase 3 adds a turret on the right, upgrades turret
-        phases.append(game_state, [(TURRET, [25, 11]), (UPGRADE, [25, 11])])
+        phases.append([(TURRET, [25, 11]), (UPGRADE, [25, 11])])
 
         # phase 4 adds a turret on mid right, upgrade turret
-        phases.append(game_state, [(TURRET, [20, 10]), (UPGRADE, [20, 10])])
+        phases.append([(TURRET, [20, 10]), (UPGRADE, [20, 10])])
 
         completed = self.build_phases(game_state, phases)
         return completed
