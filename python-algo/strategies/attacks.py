@@ -154,7 +154,7 @@ class Attacks:
         spawn_locs = [SpawnPoint1, [3, 11], [4, 11], [5, 11]]
         numAttackers = 0
         for location in spawn_locs:
-            numAttackers += len(self.get_attackers(location, 0))
+            numAttackers += len(game_state.get_attackers(location, 0))
         if numAttackers != 0:
             return SpawnPoint2
         else:
