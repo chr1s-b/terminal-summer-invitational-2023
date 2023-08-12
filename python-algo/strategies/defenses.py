@@ -54,12 +54,18 @@ class Defenses:
             return 3
 
         # expected turn 5
-        wall_positions = [[20, 11], [19, 10], [22, 14]] + [[x, 8] for x in range(16, 8, -1)]
+        wall_positions = [[20, 11], [19, 10]] + [[x, 8] for x in range(16, 8, -1)]
         phase_5 = [(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions]
         if not self.build_phase(game_state, phase_5):
             return 4
 
-        return 5
+        wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],
+                          [24, 11], [23, 10], [22, 9], [21, 8]]
+        phase_6 = [(WALL, w_pos) for w_pos in wall_positions]
+        if not self.build_phase(game_state, phase_6):
+            return 5
+
+        return 6
 
     def build_midgame_defenses(self, game_state):
         """Upgrade and maintain defences in the mid-game."""
