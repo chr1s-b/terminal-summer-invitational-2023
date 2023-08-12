@@ -58,7 +58,7 @@ class Defenses:
         opening_phase = 4
 
         # expected turn 5
-        wall_positions = [[20, 11], [19, 10], [22, 14]] + [[x, 8] for x in range(9, 17)]
+        wall_positions = [[20, 11], [19, 10], [22, 14]] + [[x, 8] for x in range(16, 8, -1)]
         phase_5 = [(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions]
         if not self.build_phase(phase_5):
             return
