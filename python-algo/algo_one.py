@@ -83,31 +83,15 @@ class AlgoStrategyOne(gamelib.AlgoCore):
 
         # only try to build the opening if the opening has not been completed yet
         if not self.five_turret_complete:
-            self.five_turret_complete = self.openings.five_turret(game_state)
+            phase_complete = self.defenses.five_turret(game_state)
+            if phase_complete == 5:
+                self.five_turret_complete = True
             # TODO send mobile units
+
+        if self.five_turret_complete:
+            midgame_phase = self.defenses.build_midgame_defenses(game_state)
 
         self.attacks.attack(game_state, self.strat_phase)
 
-        return
-        
-        
-
-        # maintain opening
-
-        # middle/late game
-
-        # defence
-        # try to move to the next phase according to doc
-        self.defenses.build_midgame_defenses(game_state)
-
-        # not sure about the below
-        priority_walls = destroyed_structures[WALL] + []
-        upgradeable_turrets = []
-        new_turrets = []
-        new_walls = []
-
-        game_state.attempt_spawn(priority_walls)
-        game_state.attempt_upgrade(upgradeable_turrets)
-        game_state.attempt_spawn(new_turrets)
-        game_state.attempt_upgrade(new_turrets)
-        game_state.attempt_spawn(new_walls)
+        # repair walls with remaining credit
+        game_state.attempt_spawn(WALL, destroyed_structures[WALL])
