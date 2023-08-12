@@ -20,9 +20,9 @@ class Attacks:
         SpawnPoint2 = [7, 6] #low-left
         SpawnPoint3 = [21, 7] #high-right
         SpawnPoint4 = [17, 3] #low-right
-        global sent_destroyers, turn_remove_mid
+        global sent_destroyers
         sent_destroyers = False
-        turn_remove_mid = -1
+        self.mid_attack_next_turn = False
         return
 
     def attack(self, game_state, strat_phase):
@@ -45,9 +45,8 @@ class Attacks:
             self.early_scouts(game_state)
 
         if strat_phase > middleStillOpen:
-            global turn_remove_mid
             global sent_destroyers
-            if turn_remove_mid == game_state.turn_number:
+            if self.mid_attack_next_turn:  # now it's "next turn"
                 game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
                 self.early_scouts(game_state)
                 game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
@@ -58,7 +57,7 @@ class Attacks:
 
                 if game_state.turn_number > 15 and damageMid < damageGauntlet and numMP >= 12:
                     game_state.attempt_remove([9,8])
-                    turn_remove_mid = game_state.turn_number + 1
+                    self.mid_attack_next_turn = True
                 else:
                     # send scout + demo combo round after sending destroyers, then revert
                     # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
