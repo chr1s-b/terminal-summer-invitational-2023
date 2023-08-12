@@ -45,7 +45,7 @@ class Attacks:
             if depRight[0] != 0:
                 game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
             self.early_scouts(game_state)
-            
+
         if strat_phase > middleStillOpen:
             global turn_remove_mid
             global sent_destroyers
@@ -59,21 +59,19 @@ class Attacks:
                 gauntletSpawn = gauntletList[0]
                 game_state_copy = game_state
                 damageMid = self.simul_remove_mid(game_state_copy)
-                
+
                 if game_state.turn_number > 15 and damageMid < damageGauntlet and numMP >= 12:
                     game_state.attempt_remove([9,8])
                     turn_remove_mid = game_state.turn_number + 1
                 else:
                     # send scout + demo combo round after sending destroyers, then revert
-                        # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
-                    if not sent_destoyers:
+                    # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
+                    if not sent_destroyers:
                         game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)    
                         sent_destroyers = True
                     else:
                         self.scout_demo_combo(game_state)
-                        sent_destroyers = False
-            
-            
+                        sent_destroyers = False    
 
     def least_damage_path(self, game_state, location_options):
         damages = []
@@ -176,7 +174,7 @@ class Attacks:
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
-        listicle = self.least_damage_path(game_state_copy, spawnLoc)
+        listicle = self.least_damage_path(game_state, spawnLoc)
         return [listicle[0], listicle[1]]
 
     def where_spawn_dest(self, game_state):
@@ -190,7 +188,7 @@ class Attacks:
         self.game_state_copy.remove_unit([9,8])
         listicle = self.least_damage_path(game_state_copy, SpawnPoint2)
         return listicle[1]
-        
+
     def scout_demo_combo(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 1)
         spawnLoc = self.where_spawn_dest(game_state)
