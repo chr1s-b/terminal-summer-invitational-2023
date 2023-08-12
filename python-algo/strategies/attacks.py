@@ -50,6 +50,8 @@ class Attacks:
             global turn_remove_mid
             global sent_destroyers
             if turn_remove_mid == game_state.turn_number:
+                game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
+                self.early_scouts(game_state)
                 game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
             else:
                 gauntletList = self.send_boosted_destroyers(game_state)
