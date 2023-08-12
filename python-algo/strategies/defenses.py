@@ -75,6 +75,21 @@ class Defenses:
         # phase 4 adds a turret on mid right, upgrade turret
         phases.append([(TURRET, [20, 10]), (UPGRADE, [20, 10])])
 
+        # phase 5 reinforce right of gaunlet with upgraded walls and new turret
+        wall_positions = [[26, 13], [27, 13], [25, 13], [26, 12]] #? not sure about order
+        phases.append([(TURRET, [24, 12]), (UPGRADE, [24, 12]), 
+                       (TURRET, [25, 11]), (UPGRADE, [25, 11])] 
+                       + [(UPGRADE, w_pos) for w_pos in wall_positions]
+                       + (TURRET, [24, 10]), (UPGRADE, [24, 10]))
+
+        # phase 6 add supports
+        backwall_supports = [[i, 9] for i in range(16, 10, -1)]
+        positions = [[20, 10], [23, 9], [19, 9]] + backwall_supports
+        phase = []
+        for pos in positions:
+            phase += [(SUPPORT, pos), (UPGRADE, pos)]
+        phases.append(phase)
+
         completed = self.build_phases(game_state, phases)
         return completed
 
@@ -104,3 +119,17 @@ class Defenses:
             if not isComplete:
                 return i
         return len(phases)
+
+    def check_backwall_holes(self, game_state):
+        """List holes in backwall."""
+        backwall = [[7, 11], [7, 10], [8, 9]] + [[x, 8] for x in range(9, 17)]
+        holes = []
+        for pos in backwall:
+            if not game_state.contains_stationary_unit(pos):
+                holes.append(pos)
+        return holes
+
+    def is_completed_backwall(self, game_state):
+        """Return if backwall is in a complete state."""
+        holes = self.check_backwall_holes(game_state)
+        return len(holes) <= 1
