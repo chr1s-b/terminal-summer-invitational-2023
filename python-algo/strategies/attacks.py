@@ -47,9 +47,8 @@ class Attacks:
         if strat_phase > middleStillOpen:
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
-                game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
-                self.early_scouts(game_state)
-                game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+                self.do_mid_attack(game_state)
+                self.mid_attack_next_turn = False
             else:
                 gauntletSpawn, damageGauntlet = self.send_boosted_destroyers(game_state)
                 game_state_copy = game_state
@@ -68,6 +67,12 @@ class Attacks:
                     else:
                         self.scout_demo_combo(game_state)
                         sent_destroyers = False
+
+    def do_mid_attack(self, game_state):
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
+        self.early_scouts(game_state)
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+        return
 
     def least_damage_path(self, game_state, location_options):
         damages = []
