@@ -185,7 +185,7 @@ class Attacks:
         return SpawnPoint1
 
     def simul_remove_mid(self, game_state_copy):
-        game_state_copy.attempt_remove([9, 8])
+        game_state_copy.game_map.remove_unit([9, 8])
         listicle = self.least_damage_path(game_state_copy, [SpawnPoint2])
         return listicle[1]
 
