@@ -67,8 +67,9 @@ class Attacks:
                     # send scout + demo combo round after sending destroyers, then revert
                     # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
                     if not sent_destroyers:
-                        game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)    
-                        sent_destroyers = True
+                        if numMP >= 12:
+                            game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)    
+                            sent_destroyers = True
                     else:
                         self.scout_demo_combo(game_state)
                         sent_destroyers = False
@@ -120,9 +121,14 @@ class Attacks:
 
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
+        right_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         for location in locations:
-            if not game_state.contains_stationary_unit(location):
-                filtered.append(location)
+            if location in right_edges:
+                if not game_state.contains_stationary_unit(location) and not game_state.contains_stationary_unit([location[0] - 1, location[1]] and not game_state.contains_stationary_unit([location[0], location[1] + 1]):
+                    filtered.append(location)
+            else:
+                if not game_state.contains_stationary_unit(location):
+                    filtered.append(location)
         return filtered
 
     def calculate_shielding_map(self, game_state, player_index):
