@@ -54,7 +54,7 @@ class Attacks:
                 game_state_copy = game_state
                 damageMid = self.simul_remove_mid(game_state_copy)
 
-                if game_state.turn_number > 15 and damageMid < damageGauntlet and numMP >= 12:
+                if damageMid < damageGauntlet and numMP >= 12:
                     game_state.attempt_remove([9,8])
                     self.mid_attack_next_turn = True
                 else:
