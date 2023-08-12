@@ -50,7 +50,7 @@ class Defenses:
         # phase 6
         wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],
                           [24, 11], [23, 10], [22, 9], [21, 8]]
-        phases.append([(WALL, w_pos) for w_pos in wall_positions])
+        phases.append([(UPGRADE, u_pos) for u_pos in [[25, 13], [26, 13], [27, 13]]] + [(WALL, w_pos) for w_pos in wall_positions])
 
         completed = self.build_phases(game_state, phases)
         return completed
@@ -62,8 +62,9 @@ class Defenses:
         phases = []
 
         # phase 0 corresponds to opening complete
-        # phase 1 adds a turret on left
-        phases.append([(TURRET, [1, 12])])
+        # phase 1 adds a turret on left and builds upgraded supports
+        support_positions_phase_1 = [[12, 7], [13, 7], [14, 7]]
+        phases.append([(TURRET, [1, 12])] + [(SUPPORT, s_pos) for s_pos in support_positions_phase_1] + [(UPGRADE, s_pos) for s_pos in support_positions_phase_1])
 
         # phase 2 upgrades left turret, adds walls
         wall_positions = [[2, 12], [4, 12], [5, 12], [22, 12]]
