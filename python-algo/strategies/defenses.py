@@ -78,10 +78,10 @@ class Defenses:
 
         # phase 5 reinforce right of gaunlet with upgraded walls and new turret
         wall_positions = [[26, 13], [27, 13], [25, 13], [26, 12]] #? not sure about order
-        phases.append([(TURRET, [24, 12]), (UPGRADE, [24, 12]), 
-                       (TURRET, [25, 11]), (UPGRADE, [25, 11])] 
+        phases.append([(TURRET, [24, 12]), (UPGRADE, [24, 12]),
+                       (TURRET, [25, 11]), (UPGRADE, [25, 11])]
                        + [(UPGRADE, w_pos) for w_pos in wall_positions]
-                       + (TURRET, [24, 10]), (UPGRADE, [24, 10]))
+                       + [(TURRET, [24, 10]), (UPGRADE, [24, 10])])
 
         # phase 6 add supports
         backwall_supports = [[i, 9] for i in range(16, 10, -1)]
