@@ -34,9 +34,7 @@ class Attacks:
             game_state.attempt_spawn(SCOUT, [6, 7], 3)
 
         if strat_phase < middleStillOpen:
-            interceptors = self.spawn_intercept(game_state)
-            depRight = interceptors[0]
-            depLeft = interceptors[1]
+            depRight, depLeft = self.spawn_intercept(game_state)
             if depLeft[0] != 0:
                 if numMP - depLeft[0] * 2 >= 2:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
@@ -54,9 +52,7 @@ class Attacks:
                 self.early_scouts(game_state)
                 game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
             else:
-                gauntletList = self.send_boosted_destroyers(game_state)
-                damageGauntlet = gauntletList[1]
-                gauntletSpawn = gauntletList[0]
+                gauntletSpawn, damageGauntlet = self.send_boosted_destroyers(game_state)
                 game_state_copy = game_state
                 damageMid = self.simul_remove_mid(game_state_copy)
 
@@ -77,43 +73,23 @@ class Attacks:
     def least_damage_path(self, game_state, location_options):
         damages = []
         for location in location_options:
-            path = game_state.find_path_to_edge(location)
-            damage = 0
-            for path_location in path:
-                # Get number of enemy turrets that can attack each location and multiply by turret damage
-                for unit in game_state.get_attackers(path_location, 0):
-                    if unit.attackRange > 3.5: # seeing if upgraded or not
-                        damage += 20
-                    else:
-                        damage += 8
+            damage = self.damage_during_path(game_state, location)
             damages.append(damage)
-
         minDamage = min(damages)
         return [location_options[damages.index(minDamage)], minDamage]
 
     def least_damage_path_enemy(self, game_state, location_options):
         damages = []
         for location in location_options:
-            path = game_state.find_path_to_edge(location)
-            damage = 0
-            for path_location in path:
-                # Get number of enemy turrets that can attack each location and multiply by turret damage
-                for unit in game_state.get_attackers(path_location, 1):
-                    if unit.attackRange > 3.5: #seeing if upgraded or not
-                        damage += 20
-                    else:
-                        damage += 8
+            damage = self.damage_during_path(game_state, location, player=1)
             damages.append(damage)
-
         minDamage = min(damages)
         return [location_options[damages.index(minDamage)], minDamage]
 
     def early_scouts(self, game_state):
         friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
-        listicle = self.least_damage_path(game_state, deploy_locations)
-        best_location = listicle[0]
-        minDamage = listicle[1]
+        best_location, minDamage = self.least_damage_path(game_state, deploy_locations)
         numScouts = int(game_state.get_resource(MP))
         totalScoutHealth = numScouts * 20
         if totalScoutHealth > minDamage:
@@ -124,7 +100,7 @@ class Attacks:
         right_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         for location in locations:
             if location in right_edges:
-                if not game_state.contains_stationary_unit(location) and not game_state.contains_stationary_unit([location[0] - 1, location[1]] and not game_state.contains_stationary_unit([location[0], location[1] + 1]):
+                if not game_state.contains_stationary_unit(location) and not game_state.contains_stationary_unit([location[0] - 1, location[1]]) and not game_state.contains_stationary_unit([location[0], location[1] + 1]):
                     filtered.append(location)
             else:
                 if not game_state.contains_stationary_unit(location):
@@ -181,7 +157,7 @@ class Attacks:
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
         listicle = self.least_damage_path(game_state, [spawnLoc])
-        return [listicle[0], listicle[1]]
+        return listicle
 
     def where_spawn_dest(self, game_state):
         spawn_locs = [SpawnPoint1, [3, 11], [4, 11]]
@@ -192,10 +168,22 @@ class Attacks:
 
     def simul_remove_mid(self, game_state_copy):
         game_state_copy.game_map.remove_unit([9, 8])
-        listicle = self.least_damage_path(game_state_copy, [SpawnPoint2])
-        return listicle[1]
+        _, minDamage = self.least_damage_path(game_state_copy, [SpawnPoint2])
+        return minDamage
 
     def scout_demo_combo(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 1)
         spawnLoc = self.where_spawn_dest(game_state)
         game_state.attempt_spawn(SCOUT, spawnLoc, 1)
+
+    def damage_during_path(self, game_state, start_location, player=0):
+        path = game_state.find_path_to_edge(start_location)
+        damage = 0
+        for path_location in path:
+            # Get number of enemy turrets that can attack each location and multiply by turret damage
+            for unit in game_state.get_attackers(path_location, player):
+                if unit.attackRange > 3.5: #seeing if upgraded or not
+                    damage += 20
+                else:
+                    damage += 8
+        return damage
