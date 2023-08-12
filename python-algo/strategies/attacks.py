@@ -1,6 +1,7 @@
 import gamelib
 import math
 
+
 class Attacks:
     def __init__(self, config):
         self.config = config
@@ -23,19 +24,19 @@ class Attacks:
 
     def attack(self, game_state, strat_phase):
         # TODO: Replace this
-        middleStillOpen = 1
+        middleStillOpen = 5
 
         if game_state.turn_number == 1:
             game_state.attempt_spawn(SCOUT, [14, 0], 1)
             game_state.attempt_spawn(SCOUT, [6, 7], 3)
-        
+
         if strat_phase < middleStillOpen:
             interceptors = self.spawn_intercept(game_state)
             depRight = interceptors[0]
             depLeft = interceptors[1]
-            if depLeft[0] != 0 :
+            if depLeft[0] != 0:
                 game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
-            if depRight[0] != 0 :
+            if depRight[0] != 0:
                 game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
             self.early_scouts(game_state)
         if strat_phase > middleStillOpen:
@@ -44,8 +45,7 @@ class Attacks:
             #self.scout_demo_combo(game_state)
             #game_state_copy = game_state
             #self.simul_remove_mid(game_state_copy)
-         
-   
+
     def least_damage_path(self, game_state, location_options):
         damages = []
         for location in location_options:
@@ -94,10 +94,10 @@ class Attacks:
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
         for location in locations:
-           if not game_state.contains_stationary_unit(location):
-              filtered.append(location)
+            if not game_state.contains_stationary_unit(location):
+                filtered.append(location)
         return filtered
-    
+
     def calculate_shielding_map(self, game_state, player_index):
         grid = [[0 for _ in range(0, game_state.game_map.ARENA_SIZE)] for _ in range(0, game_state.game_map.ARENA_SIZE)]
         for location in game_state.game_map:
@@ -148,7 +148,7 @@ class Attacks:
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
         if self.get_resource(MP, 0) >= 12:
-           game_state.attempt_spawn(DEMOLISHER, spawnLoc, 7)
+            game_state.attempt_spawn(DEMOLISHER, spawnLoc, 7)
 
     def where_spawn_dest(self, game_state):
         spawn_locs = [SpawnPoint1, [3, 11], [4, 11], [5, 11]]
@@ -168,5 +168,3 @@ class Attacks:
 
 #    def scout_demo_combo(self, game_state):
  #       pass
-
-   

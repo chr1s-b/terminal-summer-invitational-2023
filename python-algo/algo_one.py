@@ -90,6 +90,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         if self.five_turret_complete:
             midgame_phase = self.defenses.build_midgame_defenses(game_state)
 
+        self.strat_phase = phase_complete
         self.attacks.attack(game_state, self.strat_phase)
 
         # repair walls with remaining credit
