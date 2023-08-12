@@ -37,7 +37,7 @@ class Defenses:
         phases.append([(UPGRADE, [18, 9])])
 
         # phase 3
-        wall_positions = [[7, 12], [7, 11], [7, 10], [8, 9], [26, 13], [27, 13], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
+        wall_positions = [[26, 13], [27, 13], [7, 12], [7, 11], [7, 10], [8, 9], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
         phases.append([(WALL, w_pos) for w_pos in wall_positions])
 
         # phase 4
