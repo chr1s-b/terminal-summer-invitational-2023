@@ -93,5 +93,6 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         self.strat_phase = phase_complete
         self.attacks.attack(game_state, self.strat_phase)
 
+        # dont use so we can open the middle
         # repair walls with remaining credit
-        game_state.attempt_spawn(WALL, destroyed_structures[WALL])
+        # game_state.attempt_spawn(WALL, destroyed_structures[WALL])
