@@ -152,10 +152,10 @@ class Attacks:
             total_health = numPosEnemyAttackers * (20 + max_shielding)
             if minDamage_left < total_health:
                 # Gamble and send half to conserve mobile points
-                numDeploy = math.floor(total_health - minDamage_left / 6 / 2)
+                numDeploy = math.floor(total_health - minDamage_left / 6 / 4)
                 interceptors[0] = [numDeploy, SpawnPoint3]
             if minDamage_right < total_health:
-                numDeploy = math.floor(total_health - minDamage_right / 6 / 2) 
+                numDeploy = math.floor(total_health - minDamage_right / 6 / 4) 
                 interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
 

@@ -63,7 +63,7 @@ class Defenses:
 
         # phase 0 corresponds to opening complete
         # phase 1 adds a turret on left and builds upgraded supports
-        support_positions_phase_1 = [[4, 11], [5, 11], [6, 11]]
+        support_positions_phase_1 = [[12, 7], [13, 7], [14, 7]]
         phases.append([(TURRET, [1, 12])] + [(SUPPORT, s_pos) for s_pos in support_positions_phase_1] + [(UPGRADE, s_pos) for s_pos in support_positions_phase_1])
 
         # phase 2 upgrades left turret, adds walls
