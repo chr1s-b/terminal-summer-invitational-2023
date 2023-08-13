@@ -1,5 +1,5 @@
 import gamelib
-
+import math
 
 class Defenses:
     def __init__(self, config):
@@ -181,3 +181,22 @@ class Defenses:
             return game_state.type_cost(unit.unit_type, upgrade=True)[SP]
         else:
             return game_state.type_cost(structure)[SP]
+
+    def get_damaged_walls_locations(self, game_state):
+        damaged_threshold = 0.75
+        damaged_walls_locations = []
+        for location in game_state.game_map:
+            units = game_state.game_map[location]
+            if len(units) > 0 and units[0].unit_type == WALL and units[0].player_index == 0 and units[0].health/units[0].max_health < damaged_threshold:
+                damaged_walls_locations.append(location)
+
+        return damaged_walls_locations
+    
+    def remove_damaged_walls(self, game_state):
+        remaining_sp = game_state.get_resource(SP)
+        # Use up half of remainign sp next turn to replace walls
+        damaged_walls_locations = self.get_damaged_walls_locations(game_state)[0: math.ceil(remaining_sp / 2)]
+        for location in damaged_walls_locations:
+            game_state.attempt_remove(location)
+
+        return damaged_walls_locations
