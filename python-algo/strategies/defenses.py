@@ -41,6 +41,7 @@ class Defenses:
         self.holes.append([duration, locations])
         for location in locations:
             game_state.attempt_remove(location)
+            gamelib.debug_write(f'Attempting to remove at {location}.')
 
     def reset_reserved_sp(self):
         self.reserved_sp = 0
@@ -143,12 +144,16 @@ class Defenses:
                 if not unit or not unit.upgrade:
                     gamelib.debug_write(f'Could not upgrade {unit} at {location}.')
                     complete = False
+                else:
+                    gamelib.debug_write(f'Upgraded {unit} at {location}.')
             else:
                 game_state.attempt_spawn(structure, location)
                 unit = game_state.contains_stationary_unit(location)
                 if not unit:
                     gamelib.debug_write(f'Could not spawn {unit} at {location}.')
                     complete = False
+                else:
+                    gamelib.debug_write(f'Spawned {unit} at {location}.')
         # gamelib.debug_write(f'build_phase returns complete={complete}')
         return complete
 
