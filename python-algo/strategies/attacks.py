@@ -61,7 +61,7 @@ class Attacks:
 
         if strat_phase >= middleStillOpen:
             if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
-                if numMP >= 15:
+                if numMP >= 18:
                     game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
                 
             global sent_destroyers
