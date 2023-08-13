@@ -55,7 +55,7 @@ class Attacks:
 
         if strat_phase >= middleStillOpen:
             
-            if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
+            if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0 and len(game_state.game_map[[7,16]]) != 0 and len(game_state.game_map[[8,17]]) != 0:
                 if numMP >= 15:
                     game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
                 
