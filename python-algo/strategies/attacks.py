@@ -95,7 +95,7 @@ class Attacks:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
 
     def right_side_open(self, game_state):
-        if len(game_state.get_attackers(path_location, player=0)) > 3:
+        if len(game_state.get_attackers([23, 13], player=0)) > 3:
             return False
         else:
             return True
