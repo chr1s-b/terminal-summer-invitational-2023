@@ -48,7 +48,7 @@ class Defenses:
     def reserve_sp(self, amount):
         self.reserved_sp += amount
 
-    def five_turret(self, game_state):
+    def five_turret(self, game_state, destroyed_supports):
         """Builds opening state with four turrets and five walls."""
 
         phases = []
@@ -69,7 +69,7 @@ class Defenses:
             # phase 3 - build middle supports and walls
             initial_supports = [[12, 8], [13, 8]]
             wall_positions = [[26, 13], [27, 13], [7, 12], [7, 11], [7, 10], [8, 9], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
-            phases.append([(WALL, w_pos) for w_pos in wall_positions] + [support_and_upgrade for s_pos in initial_supports for support_and_upgrade in ((SUPPORT, s_pos), (UPGRADE, s_pos))])
+            phases.append([(WALL, w_pos) for w_pos in wall_positions] + ([support_and_upgrade for s_pos in initial_supports for support_and_upgrade in ((SUPPORT, s_pos), (UPGRADE, s_pos))] if len(destroyed_supports) == 0 else []))
     
             # phase 4
             phases.append([(TURRET, [21, 11]), (UPGRADE, [21, 11]),
@@ -81,10 +81,11 @@ class Defenses:
             phases.append([(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions])
     
             # phase 6
+            backup_supports = [[12, 7], [13, 7]]
             wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],
                               [24, 11], [23, 10], [22, 9], [21, 8]]
             wall_ugprades = [[25, 13], [26, 13], [27, 13], [0, 13], [1, 13], [2, 13]]
-            phases.append([(UPGRADE, u_pos) for u_pos in wall_ugprades] + [(WALL, w_pos) for w_pos in wall_positions])
+            phases.append([(UPGRADE, u_pos) for u_pos in wall_ugprades] + [(WALL, w_pos) for w_pos in wall_positions] + [support_and_upgrade for s_pos in backup_supports for support_and_upgrade in ((SUPPORT, s_pos), (UPGRADE, s_pos))])
 
         completed = self.build_phases(game_state, phases)
         return completed
