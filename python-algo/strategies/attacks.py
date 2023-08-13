@@ -77,7 +77,7 @@ class Attacks:
                     self.mid_attack_next_turn = True
                 elif damageLeft < damageGauntlet and (len(game_state.get_attackers([2, 14], 0)) <= 1 or damageLeft < damageMid) and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
-                    self.defenses.reserve_sp(3)
+                    self.defenses.reserve_sp(2)
                     self.left_attack_next_turn = True
                 else:
                     if self.right_side_open(game_state) and numMP >= 7:  
@@ -93,11 +93,9 @@ class Attacks:
         return
 
     def do_left_attack(self, game_state):
-        temporary_funnel = [[19, 8], [20, 8]]
-        if len(game_state.game_map[[21,8]]) == 0:
-            temporary_funnel.append([21,8])
+        temporary_funnel = [[23, 12], [24, 12]]
         numSP = math.floor(game_state.get_resource(SP))
-        if (numSP >= 3):
+        if (numSP >= 2):
             for temporary_funnel_location in temporary_funnel:
                 game_state.attempt_spawn(WALL, temporary_funnel_location)
                 game_state.attempt_remove(temporary_funnel_location)  
