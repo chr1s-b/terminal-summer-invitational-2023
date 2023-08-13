@@ -132,7 +132,7 @@ class Defenses:
         for structure, location in phase:
             if self.position_in_hole(location) and not force:
                 continue
-            if game_state.get_resource(SP) - self.build_cost(structure, location) < self.reserved_sp:
+            if game_state.get_resource(SP) - self.build_cost(game_state, structure, location) < self.reserved_sp:
                 # never spend reserved sp
                 continue
             if structure == UPGRADE:
