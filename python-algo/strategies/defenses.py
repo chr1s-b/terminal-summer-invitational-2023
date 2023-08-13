@@ -196,8 +196,8 @@ class Defenses:
         damaged_threshold = 0.75
         damaged_walls_locations = []
         for location in game_state.game_map:
-            units = game_state.game_map[location]
-            if len(units) > 0 and units[0].unit_type == WALL and units[0].player_index == 0 and units[0].health/units[0].max_health < damaged_threshold:
+            unit = game_state.contains_stationary_unit(location)
+            if unit and unit.unit_type == WALL and (not unit.upgraded) and unit.player_index == 0 and unit.health/unit.max_health < damaged_threshold:
                 damaged_walls_locations.append(location)
 
         return damaged_walls_locations
@@ -206,6 +206,7 @@ class Defenses:
         remaining_sp = game_state.get_resource(SP)
         # Use up half of remainign sp next turn to replace walls
         damaged_walls_locations = self.get_damaged_walls_locations(game_state)[0: math.ceil(remaining_sp / 2)]
+        gamelib.debug_write('Repairing walls: {}'.format(damaged_walls_locations))
         for location in damaged_walls_locations:
             game_state.attempt_remove(location)
 

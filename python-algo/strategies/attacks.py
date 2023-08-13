@@ -43,6 +43,8 @@ class Attacks:
             # Spawn demolishers 
             if game_state.turn_number > 0 and (numMP_enemy <= 8 or numMP > 10):
                 self.spawn_early_demolishers(game_state, our_shielding_map)
+            else:
+                self.spawn_early_demolishers(game_state, our_shielding_map, 1)
 
             # Spawn interceptors
             depRight, depLeft = self.spawn_intercept(game_state, enemy_shielding_map)
@@ -79,7 +81,7 @@ class Attacks:
                 if damageMid < damageGauntlet - 10 and damageMid < damageLeft + 20 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[9, 8]])
                     self.mid_attack_next_turn = True
-                elif damageGauntlet >= 100 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
+                elif damageLeft < damageGauntlet and damageGauntlet >= 100 and len(game_state.get_attackers([2, 14], 0)) <= 1 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
                     self.left_attack_next_turn = True
                 else:
@@ -247,11 +249,11 @@ class Attacks:
 
         return inflicted_damage
 
-    def spawn_early_demolishers(self, game_state, our_shielding_map):
+    def spawn_early_demolishers(self, game_state, our_shielding_map, max_amount = 100):
         bottom_left_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT)
         bottom_right_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         deploy_locations = self.filter_blocked_locations(bottom_left_locations + bottom_right_locations, game_state)
-        spawn_number = game_state.number_affordable(DEMOLISHER)
+        spawn_number = min(game_state.number_affordable(DEMOLISHER), max_amount)
         max_damage = 0
         best_location = SpawnPoint3
         for location in deploy_locations:
