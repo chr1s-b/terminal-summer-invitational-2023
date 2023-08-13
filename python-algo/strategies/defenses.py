@@ -178,6 +178,6 @@ class Defenses:
             unit = game_state.contains_stationary_unit(location)
             if not unit:
                 return 0
-            return game_state.type_cost(unit, upgrade=True)[SP]
+            return game_state.type_cost(unit.unit_type, upgrade=True)[SP]
         else:
             return game_state.type_cost(structure)[SP]
