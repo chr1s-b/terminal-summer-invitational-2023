@@ -28,10 +28,12 @@ class Defenses:
         return False
 
     def update_holes(self):
-        for i in range(len(self.holes)):
-            self.holes[i][0] -= 1
-            if self.holes[i][0] < 0:
-                self.holes.pop(i)
+        updated_holes = []
+        for hole in self.holes:
+            hole[0] -= 1
+            if hole[0] >= 0:  # not expired
+                updated_holes.append(hole)
+        self.holes = updated_holes
 
     def make_hole(self, game_state, locations, duration=1):
         """Make a hole in the defenses for {duration} turns."""
