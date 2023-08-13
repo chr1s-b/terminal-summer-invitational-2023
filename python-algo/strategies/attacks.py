@@ -40,7 +40,7 @@ class Attacks:
                 self.do_left_attack(game_state)
 
             # Spawn demolishers 
-            if game_state.turn_number > 0 and numMP_enemy <= 8:
+            if game_state.turn_number > 0 and (numMP_enemy <= 8 or numMP > 10):
                 self.spawn_early_demolishers(game_state, our_shielding_map)
 
             # Spawn interceptors
@@ -247,9 +247,19 @@ class Attacks:
         return inflicted_damage
 
     def spawn_early_demolishers(self, game_state, our_shielding_map):
+        bottom_left_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT)
+        bottom_right_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
+        deploy_locations = self.filter_blocked_locations(bottom_left_locations + bottom_right_locations, game_state)
         spawn_number = game_state.number_affordable(DEMOLISHER)
-        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 48):
-            game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, spawn_number)
+        max_damage = 0
+        best_location = SpawnPoint3
+        for location in deploy_locations:
+            potential_damage = self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map)
+            if potential_damage > max_damage:
+                max_damage = potential_damage
+                best_location = location
+        if max_damage > 48:
+            game_state.attempt_spawn(DEMOLISHER, best_location, spawn_number)
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
