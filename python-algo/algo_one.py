@@ -90,7 +90,9 @@ class AlgoStrategyOne(gamelib.AlgoCore):
             midgame_phase = self.defenses.build_midgame_defenses(game_state)
 
         self.strat_phase = phase_complete
-        self.attacks.attack(game_state, self.strat_phase)
+        holes_for_next_round = self.attacks.attack(game_state, self.strat_phase)
+        self.defenses.flush_keep_clear()
+        self.defenses.keep_clear(holes_for_next_round)
 
         # dont use so we can open the middle
         # repair walls with remaining credit
