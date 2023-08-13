@@ -57,7 +57,7 @@ class Attacks:
                     game_state.attempt_remove([9,8])
                     self.mid_attack_next_turn = True
                 else:
-                    if self.right_side_open(game_state) and numMP >= 12:  
+                    if self.right_side_open(game_state) and numMP >= 6:  
                         self.scout_demo_combo(game_state)
                     else:
                         if numMP > 13:
@@ -95,7 +95,7 @@ class Attacks:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
 
     def right_side_open(self, game_state):
-        if len(game_state.get_attackers([23, 13], 0)) > 1:
+        if len(game_state.get_attackers([23, 13], 0)) >= 1:
             return False
         else:
             return True
@@ -130,7 +130,7 @@ class Attacks:
         # TODO: Change this
         middleIsOpen = True
         enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
-
+        numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
         numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
@@ -151,13 +151,22 @@ class Attacks:
             max_shielding = max([enemy_shielding_map[enemy_path_location[0]][enemy_path_location[1]] for enemy_path_location in enemy_path_locations])
 
             total_health = numPosEnemyAttackers * (20 + max_shielding)
-            if minDamage_left < total_health:
-                # Gamble and send half to conserve mobile points
-                numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
-                interceptors[0] = [numDeploy, SpawnPoint3]
-            if minDamage_right < total_health:
-                numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
-                interceptors[1] = [numDeploy, SpawnPoint2]
+            if numMP_enemy >= 9:
+                if minDamage_left < total_health:
+                    # Gamble and send half to conserve mobile points
+                    numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
+                    interceptors[0] = [numDeploy, SpawnPoint3]
+                if minDamage_right < total_health:
+                    numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
+                    interceptors[1] = [numDeploy, SpawnPoint2]
+            else:
+                if minDamage_left <= minDamage_right and minDamage_left < total_health:
+                    # Gamble and send half to conserve mobile points
+                    numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
+                    interceptors[0] = [numDeploy, SpawnPoint3]
+                if minDamage_right < minDamage_left and minDamage_right < total_health:
+                    numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
+                    interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
 
     def send_boosted_destroyers(self, game_state):
