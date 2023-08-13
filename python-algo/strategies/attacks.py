@@ -27,15 +27,19 @@ class Attacks:
         # TODO: Replace this
         middleStillOpen = 5
         numMP = math.floor(game_state.get_resource(MP))
+        numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
             depRight, depLeft = self.spawn_intercept(game_state)
             if depLeft[0] != 0:
-                if numMP - depLeft[0] * 2 >= 2:
+                if numMP - depLeft[0] * 2 >= 2 and numMP_enemy >= 12:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
                 else:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], 1)
             if depRight[0] != 0:
-                game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
+                if numMP_enemy >= 12:
+                    game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
+                else:
+                    game_state.attempt_spawn(INTERCEPTOR, depRight[1], 1)
             if(game_state.turn_number != 0):
                 self.early_scouts(game_state)
 
