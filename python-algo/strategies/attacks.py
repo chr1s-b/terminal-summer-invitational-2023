@@ -57,7 +57,7 @@ class Attacks:
             
             if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
                 if numMP >= 15:
-                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
                 
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
