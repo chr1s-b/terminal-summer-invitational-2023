@@ -45,7 +45,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         SP = 0
         # This is a good place to do initial setup
         self.defenses = strategies.Defenses(config)
-        self.attacks = strategies.Attacks(config)
+        self.attacks = strategies.Attacks(config, self.defenses)
         self.openings = strategies.Openings(config)
         self.utilities = strategies.Utilities(config)
 
@@ -80,6 +80,8 @@ class AlgoStrategyOne(gamelib.AlgoCore):
     def starter_strategy(self, game_state):
         destroyed_structures = self.utilities.destroyed_structures
 
+        self.defenses.update_holes()
+
         # only try to build the opening if the opening has not been completed yet
         phase_complete = self.defenses.five_turret(game_state)
         gamelib.debug_write(f'Opening phase complete: {phase_complete}')
@@ -90,9 +92,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
             midgame_phase = self.defenses.build_midgame_defenses(game_state)
 
         self.strat_phase = phase_complete
-        holes_for_next_round = self.attacks.attack(game_state, self.strat_phase)
-        self.defenses.flush_keep_clear()
-        self.defenses.keep_clear(holes_for_next_round)
+        self.attacks.attack(game_state, self.strat_phase)
 
         # dont use so we can open the middle
         # repair walls with remaining credit

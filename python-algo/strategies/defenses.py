@@ -15,16 +15,29 @@ class Defenses:
         MP = 1
         SP = 0
         self.scored_on_locations = []
-        self.keep_clear = []
+        self.holes = []
 
         self.phase = 0
         return
 
-    def keep_clear(self, positions):
-        self.keep_clear += positions
+    def position_in_hole(self, position):
+        for hole in self.holes:
+            _, positions = hole
+            if position in positions:
+                return True
+        return False
 
-    def flush_keep_clear(self):
-        self.keep_clear = []
+    def update_holes(self):
+        for i in range(self.holes):
+            self.holes[i][0] -= 1
+            if self.holes[i][0] < 0:
+                self.holes.pop(i)
+
+    def make_hole(self, game_state, locations, duration=1):
+        """Make a hole in the defenses for {duration} turns."""
+        self.holes.append([duration, locations])
+        for location in locations:
+            game_state.attempt_remove(location)
 
     def five_turret(self, game_state):
         """Builds opening state with four turrets and five walls."""
@@ -106,7 +119,7 @@ class Defenses:
         """Build phase and return whether complete."""
         complete = True
         for structure, location in phase:
-            if location in self.keep_clear and not force:
+            if self.position_in_hole(location) and not force:
                 continue
             if structure == UPGRADE:
                 game_state.attempt_upgrade(location)
