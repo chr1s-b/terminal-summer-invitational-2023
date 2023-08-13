@@ -31,7 +31,7 @@ class Attacks:
         if strat_phase < middleStillOpen:
             depRight, depLeft = self.spawn_intercept(game_state)
             if depLeft[0] != 0:
-                if numMP - depLeft[0] * 2 >= 2 and numMP_enemy >= 12:
+                if numMP - depLeft[0] * 2 >= 4 and numMP_enemy >= 12:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
                 else:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], 1)
@@ -95,7 +95,7 @@ class Attacks:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
 
     def right_side_open(self, game_state):
-        if len(game_state.get_attackers(path_location, player=0)) > 5:
+        if len(game_state.get_attackers(path_location, player=0)) > 3:
             return False
         else:
             return True
@@ -151,11 +151,11 @@ class Attacks:
             max_shielding = max([enemy_shielding_map[enemy_path_location[0]][enemy_path_location[1]] for enemy_path_location in enemy_path_locations])
 
             total_health = numPosEnemyAttackers * (20 + max_shielding)
-            if minDamage_left <= minDamage_right and minDamage_left < total_health:
+            if minDamage_left < total_health:
                 # Gamble and send half to conserve mobile points
                 numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
                 interceptors[0] = [numDeploy, SpawnPoint3]
-            if minDamage_right < minDamage_left and minDamage_right < total_health:
+            if minDamage_right < total_health:
                 numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                 interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
