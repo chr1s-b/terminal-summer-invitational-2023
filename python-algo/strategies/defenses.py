@@ -15,9 +15,16 @@ class Defenses:
         MP = 1
         SP = 0
         self.scored_on_locations = []
+        self.keep_clear = []
 
         self.phase = 0
         return
+
+    def keep_clear(self, positions):
+        self.keep_clear += positions
+
+    def flush_keep_clear(self):
+        self.keep_clear = []
 
     def five_turret(self, game_state):
         """Builds opening state with four turrets and five walls."""
@@ -95,10 +102,12 @@ class Defenses:
         completed = self.build_phases(game_state, phases)
         return completed
 
-    def build_phase(self, game_state, phase):
+    def build_phase(self, game_state, phase, force=False):
         """Build phase and return whether complete."""
         complete = True
         for structure, location in phase:
+            if location in self.keep_clear and not force:
+                continue
             if structure == UPGRADE:
                 game_state.attempt_upgrade(location)
                 unit = game_state.contains_stationary_unit(location)
@@ -114,10 +123,10 @@ class Defenses:
         # gamelib.debug_write(f'build_phase returns complete={complete}')
         return complete
 
-    def build_phases(self, game_state, phases):
+    def build_phases(self, game_state, phases, force=False):
         """Build multiple phases and return how many are complete."""
         for i, phase in enumerate(phases):
-            isComplete = self.build_phase(game_state, phase)
+            isComplete = self.build_phase(game_state, phase, force)
             if not isComplete:
                 return i
         return len(phases)
