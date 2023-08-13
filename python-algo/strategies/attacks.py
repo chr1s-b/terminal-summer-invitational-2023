@@ -56,7 +56,7 @@ class Attacks:
         if strat_phase >= middleStillOpen:
             
             if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
-                if numMP >= 12:
+                if numMP >= 15:
                     game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
                 
             global sent_destroyers
@@ -83,7 +83,7 @@ class Attacks:
                     if self.right_side_open(game_state) and numMP >= 7:  
                         self.scout_demo_combo(game_state)
                     else:
-                        if numMP > 13:
+                        if numMP >= 15:
                             game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)
 
     def do_mid_attack(self, game_state):
