@@ -87,6 +87,7 @@ class Attacks:
 
     def do_left_attack(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, self.where_spawn_dest(game_state), 1)
+        game_state.attempt_spawn(SCOUT, [15, 1], 5)
         game_state.attempt_spawn(SCOUT, [14,0], 20)
         return
     
@@ -107,13 +108,23 @@ class Attacks:
         return [location_options[damages.index(minDamage)], minDamage]
 
     def early_scouts(self, game_state):
-        friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
+        bottom_left_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT)
+        bottom_right_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
+        friendly_edges = bottom_left_locations + bottom_right_locations
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
         best_location, minDamage = self.least_damage_path(game_state, deploy_locations)
         numScouts = int(game_state.get_resource(MP))
         totalScoutHealth = numScouts * 20
         if totalScoutHealth > minDamage:
-            game_state.attempt_spawn(SCOUT, best_location, numScouts)
+            if numScouts <= 5:
+                game_state.attempt_spawn(SCOUT, best_location, numScouts)
+            else: 
+                if best_location in bottom_left_locations:
+                    suicide_location = (16, 2)
+                else:
+                    suicide_location = (best_location[0] + 1, best_location[1] + 1)
+                game_state.attempt_spawn(SCOUT, suicide_location, 5)
+                game_state.attempt_spawn(SCOUT, best_location, max(numScouts - 5, 0))
 
     def right_side_open(self, game_state):
         if len(game_state.get_attackers([23, 13], 0)) >= 1:
@@ -186,7 +197,7 @@ class Attacks:
                     numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                     interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
-    
+            
     def spawn_early_demolishers(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
 
