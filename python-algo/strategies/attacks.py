@@ -151,7 +151,7 @@ class Attacks:
             max_shielding = max([enemy_shielding_map[enemy_path_location[0]][enemy_path_location[1]] for enemy_path_location in enemy_path_locations])
 
             total_health = numPosEnemyAttackers * (20 + max_shielding)
-            if numMP_enemy >= 9:
+            if numMP_enemy >= 15:
                 if minDamage_left < total_health:
                     # Gamble and send half to conserve mobile points
                     numDeploy = min(2, math.floor((total_health - minDamage_left) / 6 / 4))
