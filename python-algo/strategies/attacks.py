@@ -21,6 +21,7 @@ class Attacks:
         SpawnPoint3 = [21, 7] #high-right
         SpawnPoint4 = [17, 3] #low-right
         self.mid_attack_next_turn = False
+        self.left_attack_next_turn = False
         return
 
     def attack(self, game_state, strat_phase):
@@ -48,14 +49,22 @@ class Attacks:
             if self.mid_attack_next_turn:  # now it's "next turn"
                 self.do_mid_attack(game_state)
                 self.mid_attack_next_turn = False
+            elif self.left_attack_next_turn:
+                self.do_left_attack(game_state)
+                self.left_attack_next_turn = False
             else:
                 gauntletSpawn, damageGauntlet = self.send_boosted_destroyers(game_state)
                 game_state_copy = game_state
+                game_state_copy_left = game_state
                 damageMid = self.simul_remove_mid(game_state_copy)
-
-                if damageMid < damageGauntlet and numMP >= 12:
+                damageLeft = self.simul_remove_left(game_state_copy_left)
+                if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
                     game_state.attempt_remove([9,8])
                     self.mid_attack_next_turn = True
+                elif damageLeft < damageGauntlet and damageLeft < damageMid and numMP >= 12:
+                    game_state.attempt_remove([2,12])
+                    game_state.attempt_remove([2,13])
+                    self.left_attack_next_turn = True
                 else:
                     if self.right_side_open(game_state) and numMP >= 6:  
                         self.scout_demo_combo(game_state)
@@ -69,6 +78,11 @@ class Attacks:
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
         return
 
+    def do_left_attack(self, game_state):
+        game_state.attempt_spawn(DEMOLISHER, self.where_spawn_dest(game_state), 1)
+        game_state.attempt_spawn(SCOUT, [14,0], 20)
+        return
+    
     def least_damage_path(self, game_state, location_options):
         damages = []
         for location in location_options:
@@ -186,6 +200,14 @@ class Attacks:
         _, minDamage = self.least_damage_path(game_state_copy, [SpawnPoint2])
         return minDamage
 
+    def simul_remove_left(self, game_state_copy):
+        if game_state_copy.contains_stationary_unit([2,12]):
+            game_state_copy.game_map.remove_unit([2, 12])
+        if game_state_copy.contains_stationary_unit([2,13]):
+            game_state_copy.game_map.remove_unit([2, 13])
+        _, minDamage = self.least_damage_path(game_state_copy, [14, 0])
+        return minDamage
+    
     def scout_demo_combo(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
         spawnLoc = self.where_spawn_dest(game_state)
