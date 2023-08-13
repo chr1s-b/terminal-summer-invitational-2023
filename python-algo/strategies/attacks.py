@@ -24,6 +24,7 @@ class Attacks:
         SpawnPoint4 = [17, 3] #low-right
         self.mid_attack_next_turn = False
         self.left_attack_next_turn = False
+        self.our_shielding_map = None
         return
 
     def attack(self, game_state, strat_phase):
@@ -31,7 +32,7 @@ class Attacks:
 
         numMP = math.floor(game_state.get_resource(MP))
         enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
-        our_shielding_map = self.calculate_shielding_map(game_state, player_index=0)
+        self.our_shielding_map = self.calculate_shielding_map(game_state, player_index=0)
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
             # Prioritize planned attacks from the previous turn
@@ -40,11 +41,14 @@ class Attacks:
             elif self.left_attack_next_turn:
                 self.do_left_attack(game_state)
 
+            if game_state.turn_number > 0:
+                self.early_scouts(game_state, damage_threshold=4)
+
             # Spawn demolishers 
             if game_state.turn_number > 0 and (numMP_enemy <= 8 or numMP > 10):
-                self.spawn_early_demolishers(game_state, our_shielding_map)
+                self.spawn_early_demolishers(game_state)
             else:
-                self.spawn_early_demolishers(game_state, our_shielding_map, 1)
+                self.spawn_early_demolishers(game_state, 2)
 
             # Spawn interceptors
             depRight, depLeft = self.spawn_intercept(game_state, enemy_shielding_map)
@@ -121,15 +125,20 @@ class Attacks:
         minDamage = min(damages)
         return [location_options[damages.index(minDamage)], minDamage]
 
-    def early_scouts(self, game_state):
+    def early_scouts(self, game_state, damage_threshold=0):
         bottom_left_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT)
         bottom_right_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         friendly_edges = bottom_left_locations + bottom_right_locations
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
         best_location, minDamage = self.least_damage_path(game_state, deploy_locations)
+        scout_path = game_state.find_path_to_edge(best_location)
+        if not scout_path:
+            return
+        scout_shielding = max([self.our_shielding_map[location[0]][location[1]] for location in scout_path])
+        scout_health = 20 + scout_shielding
         numScouts = int(game_state.get_resource(MP))
-        totalScoutHealth = numScouts * 20
-        if totalScoutHealth > minDamage:
+        totalScoutHealth = numScouts * scout_health
+        if totalScoutHealth > minDamage and (totalScoutHealth - minDamage)/scout_health > damage_threshold:
             if numScouts <= 5:
                 game_state.attempt_spawn(SCOUT, best_location, numScouts)
             else:
@@ -214,9 +223,9 @@ class Attacks:
                     interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
 
-    def calculate_demolisher_damage(self, game_state, spawn_location, spawn_count, our_shielding_map):
+    def calculate_demolisher_damage(self, game_state, spawn_location, spawn_count):
         # This is an estimate since it doesn't simulate the destruction of buildings
-        base_demolisher_health = 5 + our_shielding_map[spawn_location[0]][spawn_location[1]]
+        base_demolisher_health = 5 + self.our_shielding_map[spawn_location[0]][spawn_location[1]]
         demolisher_damage = 8
         demolisher_path = game_state.find_path_to_edge(spawn_location)
         if not demolisher_path:
@@ -249,7 +258,7 @@ class Attacks:
 
         return inflicted_damage
 
-    def spawn_early_demolishers(self, game_state, our_shielding_map, max_amount = 100):
+    def spawn_early_demolishers(self, game_state, max_amount = 100):
         bottom_left_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT)
         bottom_right_locations = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
         deploy_locations = self.filter_blocked_locations(bottom_left_locations + bottom_right_locations, game_state)
@@ -257,7 +266,7 @@ class Attacks:
         max_damage = 0
         best_location = SpawnPoint3
         for location in deploy_locations:
-            potential_damage = self.calculate_demolisher_damage(game_state, location, spawn_number, our_shielding_map)
+            potential_damage = self.calculate_demolisher_damage(game_state, location, spawn_number)
             if potential_damage > max_damage:
                 max_damage = potential_damage
                 best_location = location
@@ -270,6 +279,11 @@ class Attacks:
         return listicle
 
     def where_spawn_dest(self, game_state):
+        spawn_locs = [SpawnPoint1, [3, 11], [4, 11], [3, 10], [4, 10]]
+        damages = [self.calculate_demolisher_damage(game_state, location, 1) for location in spawn_locs]
+        return spawn_locs[damages.index(max(damages))]
+    
+    def where_spawn_scouts(self, game_state):
         spawn_locs = [SpawnPoint1, [3, 11], [4, 11]]
         for location in spawn_locs:
             if len(game_state.get_attackers(location, 0)) > 0:
@@ -293,7 +307,7 @@ class Attacks:
 
     def scout_demo_combo(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
-        spawnLoc = self.where_spawn_dest(game_state)
+        spawnLoc = self.where_spawn_scouts(game_state)
         game_state.attempt_spawn(SCOUT, spawnLoc, 10)
 
     def damage_during_path(self, game_state, start_location, player=0):
