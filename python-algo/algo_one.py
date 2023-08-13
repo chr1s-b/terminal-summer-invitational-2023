@@ -82,6 +82,7 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         self.defenses.update_holes()
 
         # only try to build the opening if the opening has not been completed yet
+        self.attacks.build_funnels(game_state)
         phase_complete = self.defenses.five_turret(game_state)
         gamelib.debug_write(f'Opening phase complete: {phase_complete}')
         if phase_complete == 6:

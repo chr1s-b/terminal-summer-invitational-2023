@@ -33,6 +33,12 @@ class Attacks:
         our_shielding_map = self.calculate_shielding_map(game_state, player_index=0)
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
+            # Prioritize planned attacks from the previous turn
+            if self.mid_attack_next_turn:
+                self.do_mid_attack(game_state)
+            elif self.left_attack_next_turn:
+                self.do_left_attack(game_state)
+
             # Spawn demolishers 
             if game_state.turn_number > 0 and numMP_enemy <= 8:
                 self.spawn_early_demolishers(game_state, our_shielding_map)
@@ -54,7 +60,6 @@ class Attacks:
                 self.early_scouts(game_state)
 
         if strat_phase >= middleStillOpen:
-            
             if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
                 if numMP >= 15:
                     game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
@@ -62,10 +67,8 @@ class Attacks:
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
                 self.do_mid_attack(game_state)
-                self.mid_attack_next_turn = False
             elif self.left_attack_next_turn:
                 self.do_left_attack(game_state)
-                self.left_attack_next_turn = False
             else:
                 gauntletSpawn, damageGauntlet = self.send_boosted_destroyers(game_state)
                 game_state_copy = game_state
@@ -90,17 +93,13 @@ class Attacks:
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 2)
         self.early_scouts(game_state)
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+        self.mid_attack_next_turn = False
         return
 
     def do_left_attack(self, game_state):
-        temporary_funnel = [[23, 12], [24, 12]]
-        numSP = math.floor(game_state.get_resource(SP))
-        if (numSP >= 2):
-            for temporary_funnel_location in temporary_funnel:
-                game_state.attempt_spawn(WALL, temporary_funnel_location)
-                game_state.attempt_remove(temporary_funnel_location)  
         game_state.attempt_spawn(DEMOLISHER, [3,10], 2)
         game_state.attempt_spawn(SCOUT, [16, 2], 20)
+        self.left_attack_next_turn = False
         return
 
     def least_damage_path(self, game_state, location_options):
@@ -298,3 +297,12 @@ class Attacks:
                 else:
                     damage += 8
         return damage
+
+    def build_funnels(self, game_state):
+        if self.left_attack_next_turn:
+            temporary_funnel = [[23, 12], [24, 12]]
+            numSP = math.floor(game_state.get_resource(SP))
+            if (numSP >= 2):
+                for temporary_funnel_location in temporary_funnel:
+                    game_state.attempt_spawn(WALL, temporary_funnel_location)
+                    game_state.attempt_remove(temporary_funnel_location)  
