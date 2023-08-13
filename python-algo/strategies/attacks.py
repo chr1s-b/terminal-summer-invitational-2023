@@ -69,11 +69,11 @@ class Attacks:
                 damageMid = self.simul_remove_mid(game_state_copy)
                 damageLeft = self.simul_remove_left(game_state_copy_left)
                 if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
-                    self.defenses.make_hole([9, 8])
+                    self.defenses.make_hole(game_state, [9, 8])
                     self.mid_attack_next_turn = True
                 elif damageLeft < damageGauntlet and (len(game_state.get_attackers([2, 14], 0)) <= 1 or damageLeft < damageMid) and numMP >= 12:
-                    self.defenses.make_hole([2, 12])
-                    self.defenses.make_hole([2, 13])
+                    self.defenses.make_hole(game_state, [2, 12])
+                    self.defenses.make_hole(game_state, [2, 13])
                     self.left_attack_next_turn = True
                 else:
                     if self.right_side_open(game_state) and numMP >= 7:  
