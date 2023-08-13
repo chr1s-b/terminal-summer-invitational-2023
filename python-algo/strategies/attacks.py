@@ -27,7 +27,6 @@ class Attacks:
 
     def attack(self, game_state, strat_phase):
         middleStillOpen = 5
-        holes_for_next_round = []
 
         numMP = math.floor(game_state.get_resource(MP))
         enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
@@ -80,7 +79,6 @@ class Attacks:
                     else:
                         if numMP > 13:
                             game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)
-        return holes_for_next_round
 
     def do_mid_attack(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 2)
