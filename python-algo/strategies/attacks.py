@@ -177,7 +177,9 @@ class Attacks:
             best_location_left = enemy_path_left[0]
             minDamage_left = enemy_path_left[1]
 
-            enemy_path_locations = game_state.find_path_to_edge(enemy_path_left[0]) +  game_state.find_path_to_edge(enemy_path_right[0])
+            left_path = game_state.find_path_to_edge(enemy_path_left[0]) or []
+            right_path = game_state.find_path_to_edge(enemy_path_right[0]) or []
+            enemy_path_locations = left_path + right_path
 
             max_shielding = max([enemy_shielding_map[enemy_path_location[0]][enemy_path_location[1]] for enemy_path_location in enemy_path_locations])
 
@@ -205,6 +207,8 @@ class Attacks:
         base_demolisher_health = 5 + our_shielding_map[spawn_location[0]][spawn_location[1]]
         demolisher_damage = 8
         demolisher_path = game_state.find_path_to_edge(spawn_location)
+        if not demolisher_path:
+            return 0
         inflicted_damage = 0
         num_demolishers = spawn_count
         curr_demolisher_health = base_demolisher_health
@@ -270,6 +274,9 @@ class Attacks:
 
     def damage_during_path(self, game_state, start_location, player=0):
         path = game_state.find_path_to_edge(start_location)
+        if not path:
+            return 0
+
         damage = 0
         for path_location in path:
             # Get number of enemy turrets that can attack each location and multiply by turret damage
