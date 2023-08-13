@@ -78,7 +78,7 @@ class Attacks:
                 if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
                     self.defenses.make_hole(game_state, [[9, 8]])
                     self.mid_attack_next_turn = True
-                elif damageGauntlet >= 32 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
+                elif damageGauntlet >= 16 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
                     self.defenses.reserve_sp(2)
                     self.left_attack_next_turn = True
