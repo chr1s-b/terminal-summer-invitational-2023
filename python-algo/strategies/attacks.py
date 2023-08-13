@@ -75,12 +75,11 @@ class Attacks:
                 game_state_copy_left = game_state
                 damageMid = self.simul_remove_mid(game_state_copy)
                 damageLeft = self.simul_remove_left(game_state_copy_left)
-                if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
+                if damageMid < damageGauntlet - 10 and damageMid < damageLeft + 20 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[9, 8]])
                     self.mid_attack_next_turn = True
-                elif damageGauntlet >= 16 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
+                elif damageGauntlet >= 100 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
-                    self.defenses.reserve_sp(2)
                     self.left_attack_next_turn = True
                 else:
                     if self.right_side_open(game_state) and numMP >= 7:  
@@ -98,6 +97,7 @@ class Attacks:
 
     def do_left_attack(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, [3,10], 2)
+        game_state.attempt_spawn(SCOUT, [14,0], 5)
         game_state.attempt_spawn(SCOUT, [16, 2], 20)
         self.left_attack_next_turn = False
         return
@@ -300,9 +300,7 @@ class Attacks:
 
     def build_funnels(self, game_state):
         if self.left_attack_next_turn:
-            temporary_funnel = [[23, 12], [24, 12]]
-            numSP = math.floor(game_state.get_resource(SP))
-            if (numSP >= 2):
-                for temporary_funnel_location in temporary_funnel:
-                    game_state.attempt_spawn(WALL, temporary_funnel_location)
-                    game_state.attempt_remove(temporary_funnel_location)  
+            temporary_funnel = [[23, 12], [24, 12], [14, 2], [15, 3], [16, 4]]
+            for temporary_funnel_location in temporary_funnel:
+                game_state.attempt_spawn(WALL, temporary_funnel_location)
+                game_state.attempt_remove(temporary_funnel_location)  
