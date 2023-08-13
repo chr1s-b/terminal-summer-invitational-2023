@@ -34,7 +34,7 @@ class Attacks:
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
             # Spawn demolishers 
-            if game_state.turn_number > 0 and numMP_enemy <= 10:
+            if game_state.turn_number > 0 and numMP_enemy <= 8:
                 self.spawn_early_demolishers(game_state, our_shielding_map)
 
             # Spawn interceptors
@@ -75,7 +75,7 @@ class Attacks:
                 if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
                     self.defenses.make_hole(game_state, [[9, 8]])
                     self.mid_attack_next_turn = True
-                elif damageLeft < damageGauntlet and (len(game_state.get_attackers([2, 14], 0)) <= 1 or damageLeft < damageMid) and numMP >= 12:
+                elif damageGauntlet >= 32 and len(game_state.get_attackers([2, 14], 0)) <= 2 and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
                     self.defenses.reserve_sp(2)
                     self.left_attack_next_turn = True
@@ -249,7 +249,7 @@ class Attacks:
 
     def spawn_early_demolishers(self, game_state, our_shielding_map):
         spawn_number = game_state.number_affordable(DEMOLISHER)
-        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 40):
+        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 48):
             game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, spawn_number)
 
     def send_boosted_destroyers(self, game_state):
