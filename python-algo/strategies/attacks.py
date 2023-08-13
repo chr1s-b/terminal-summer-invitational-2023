@@ -254,7 +254,7 @@ class Attacks:
         max_damage = 0
         best_location = SpawnPoint3
         for location in deploy_locations:
-            potential_damage = self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map)
+            potential_damage = self.calculate_demolisher_damage(game_state, location, spawn_number, our_shielding_map)
             if potential_damage > max_damage:
                 max_damage = potential_damage
                 best_location = location
