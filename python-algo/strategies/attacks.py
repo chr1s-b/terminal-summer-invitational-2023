@@ -54,12 +54,6 @@ class Attacks:
                 self.early_scouts(game_state)
 
         if strat_phase >= middleStillOpen:
-            
-            if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0 and len(game_state.game_map[[7,16]]) != 0 and len(game_state.game_map[[8,17]]) != 0:
-                if numMP >= 15:
-                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
-                
-            global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
                 self.do_mid_attack(game_state)
                 self.mid_attack_next_turn = False
