@@ -56,8 +56,8 @@ class Attacks:
         if strat_phase >= middleStillOpen:
             
             if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
-                if numMP >= 12:
-                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+                if numMP >= 15:
+                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 7)
                 
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
@@ -77,12 +77,13 @@ class Attacks:
                     self.mid_attack_next_turn = True
                 elif damageLeft < damageGauntlet and (len(game_state.get_attackers([2, 14], 0)) <= 1 or damageLeft < damageMid) and numMP >= 12:
                     self.defenses.make_hole(game_state, [[2, 12], [2, 13]])
+                    self.defenses.reserve_sp(3)
                     self.left_attack_next_turn = True
                 else:
                     if self.right_side_open(game_state) and numMP >= 7:  
                         self.scout_demo_combo(game_state)
                     else:
-                        if numMP > 13:
+                        if numMP >= 15:
                             game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)
 
     def do_mid_attack(self, game_state):
