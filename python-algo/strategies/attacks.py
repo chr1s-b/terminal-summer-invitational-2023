@@ -243,7 +243,7 @@ class Attacks:
 
     def spawn_early_demolishers(self, game_state, our_shielding_map):
         spawn_number = game_state.number_affordable(DEMOLISHER)
-        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 20):
+        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 40):
             game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, spawn_number)
 
     def send_boosted_destroyers(self, game_state):
