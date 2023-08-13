@@ -92,9 +92,10 @@ class AlgoStrategyOne(gamelib.AlgoCore):
             # Replace removed walls from last turn
             midgame_phase = self.defenses.build_midgame_defenses(game_state)
             # Destroy damaged walls if not reserving SP    
+            for replace_location in self.walls_to_replace:
+                game_state.attempt_spawn(WALL, replace_location)
+
             if self.defenses.reserved_sp == 0:
-                for replace_location in self.walls_to_replace:
-                    game_state.attempt_spawn(WALL, replace_location)
                 self.walls_to_replace = self.defenses.remove_damaged_walls(game_state) 
 
         self.defenses.reset_reserved_sp()
