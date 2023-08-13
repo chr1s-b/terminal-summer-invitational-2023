@@ -95,12 +95,7 @@ class Attacks:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
 
     def right_side_open(self, game_state):
-        locations = [[23, 14], [23, 15],[23, 16], [24, 14], [24, 15],[24, 16],[25, 14], [25, 15],[25, 16]]
-        numOccupied = 0
-        for location in locations:
-            if game_state.contains_stationary_unit(location):
-                numOccupied += 1
-        if numOccupied > 5:
+        if len(game_state.get_attackers(path_location, player=0)) > 5:
             return False
         else:
             return True
@@ -139,7 +134,7 @@ class Attacks:
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
         numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
-        if numPosEnemyAttackers >= 4:
+        if numPosEnemyAttackers >= 6:
             enemy_edges_right = game_state.game_map.get_edge_locations(game_state.game_map.TOP_RIGHT)
             enemy_edges_left = game_state.game_map.get_edge_locations(game_state.game_map.TOP_LEFT)
             deploy_locations_right = self.filter_blocked_locations(enemy_edges_right, game_state)
