@@ -24,7 +24,7 @@ class Attacks:
         self.left_attack_next_turn = False
         return
 
-    def attack(self, game_state, strat_phase):            
+    def attack(self, game_state, strat_phase):
         middleStillOpen = 5
         
         numMP = math.floor(game_state.get_resource(MP))
@@ -87,9 +87,14 @@ class Attacks:
         return
 
     def do_left_attack(self, game_state):
-        game_state.attempt_spawn(DEMOLISHER, self.where_spawn_dest(game_state), 1)
-        game_state.attempt_spawn(SCOUT, [15, 1], 5)
-        game_state.attempt_spawn(SCOUT, [14,0], 20)
+        temporary_funnel = [[14, 2], [15, 3], [16, 4]] 
+        numSP = math.floor(game_state.get_resource(SP))
+        if (numSP >= 3):
+            for temporary_funnel_location in temporary_funnel:
+                game_state.attempt_spawn(WALL, temporary_funnel_location)
+                game_state.attempt_remove(temporary_funnel_location)  
+        game_state.attempt_spawn(SCOUT, [14,0], 5)
+        game_state.attempt_spawn(SCOUT, [16, 2], 20)
         return
     
     def least_damage_path(self, game_state, location_options):
