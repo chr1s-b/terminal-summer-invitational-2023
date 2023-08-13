@@ -201,11 +201,9 @@ class Attacks:
         return minDamage
 
     def simul_remove_left(self, game_state_copy):
-        if game_state_copy.contains_stationary_unit([2,12]):
-            game_state_copy.game_map.remove_unit([2, 12])
-        if game_state_copy.contains_stationary_unit([2,13]):
-            game_state_copy.game_map.remove_unit([2, 13])
-        _, minDamage = self.least_damage_path(game_state_copy, [14, 0])
+        game_state_copy.game_map.remove_unit([2, 12])
+        game_state_copy.game_map.remove_unit([2, 13])
+        _, minDamage = self.least_damage_path(game_state_copy, [[14, 0]])
         return minDamage
     
     def scout_demo_combo(self, game_state):
