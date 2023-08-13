@@ -28,7 +28,7 @@ class Defenses:
         return False
 
     def update_holes(self):
-        for i in range(self.holes):
+        for i in range(len(self.holes)):
             self.holes[i][0] -= 1
             if self.holes[i][0] < 0:
                 self.holes.pop(i)
