@@ -61,7 +61,7 @@ class Attacks:
                 if damageMid < damageGauntlet and damageMid < damageLeft and numMP >= 12:
                     game_state.attempt_remove([9,8])
                     self.mid_attack_next_turn = True
-                elif damageLeft < damageGauntlet and damageLeft < damageMid and numMP >= 12:
+                elif damageLeft < damageGauntlet and (len(game_state.get_attackers([2, 14], 0)) <= 1 or damageLeft < damageMid) and numMP >= 12:
                     game_state.attempt_remove([2,12])
                     game_state.attempt_remove([2,13])
                     self.left_attack_next_turn = True
@@ -73,7 +73,7 @@ class Attacks:
                             game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)
 
     def do_mid_attack(self, game_state):
-        game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 2)
         self.early_scouts(game_state)
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
         return
