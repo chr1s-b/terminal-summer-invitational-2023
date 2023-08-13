@@ -54,6 +54,11 @@ class Attacks:
                 self.early_scouts(game_state)
 
         if strat_phase >= middleStillOpen:
+            
+            if len(game_state.game_map[[23,14]]) != 0 and len(game_state.game_map[[22,14]]) != 0:
+                if numMP >= 12:
+                    game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 7)
+                
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
                 self.do_mid_attack(game_state)
@@ -87,13 +92,15 @@ class Attacks:
         return
 
     def do_left_attack(self, game_state):
-        temporary_funnel = [[14, 2], [15, 3], [16, 4]] 
+        temporary_funnel = [[19, 8], [20, 8]]
+        if len(game_state.game_map[[21,8]]) == 0:
+            temporary_funnel.append([21,8])
         numSP = math.floor(game_state.get_resource(SP))
         if (numSP >= 3):
             for temporary_funnel_location in temporary_funnel:
                 game_state.attempt_spawn(WALL, temporary_funnel_location)
                 game_state.attempt_remove(temporary_funnel_location)  
-        game_state.attempt_spawn(SCOUT, [14, 0], 5)
+        game_state.attempt_spawn(DEMOLISHER, [3,10], 2)
         game_state.attempt_spawn(SCOUT, [16, 2], 20)
         return
 
@@ -266,6 +273,10 @@ class Attacks:
     def simul_remove_left(self, game_state_copy):
         game_state_copy.game_map.remove_unit([2, 12])
         game_state_copy.game_map.remove_unit([2, 13])
+        game_state_copy.game_map.add_unit(WALL,[20, 8])
+        game_state_copy.game_map.add_unit(WALL,[19, 8])
+        if len(game_state_copy.game_map[[21,8]]) == 0:
+            game_state_copy.game_map.add_unit(WALL,[21, 8])
         _, minDamage = self.least_damage_path(game_state_copy, [[14, 0]])
         return minDamage
 
