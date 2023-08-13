@@ -39,9 +39,8 @@ class Defenses:
     def make_hole(self, game_state, locations, duration=1):
         """Make a hole in the defenses for {duration} turns."""
         self.holes.append([duration, locations])
-        for location in locations:
-            game_state.attempt_remove(location)
-            gamelib.debug_write(f'Attempting to remove at {location}.')
+        game_state.attempt_remove(locations)
+        gamelib.debug_write(f'Attempting to remove at {locations}.')
 
     def reset_reserved_sp(self):
         self.reserved_sp = 0
@@ -130,6 +129,8 @@ class Defenses:
         return completed
 
     def build_phase(self, game_state, phase, force=False):
+        hole_locations = [location for location in map(lambda x: x[1], self.holes)]
+        gamelib.debug_write('Hole locations {}'.format(hole_locations))
         """Build phase and return whether complete."""
         complete = True
         for structure, location in phase:
@@ -147,6 +148,8 @@ class Defenses:
                 else:
                     gamelib.debug_write(f'Upgraded {unit} at {location}.')
             else:
+                if structure == WALL and location in hole_locations:
+                    continue
                 game_state.attempt_spawn(structure, location)
                 unit = game_state.contains_stationary_unit(location)
                 if not unit:

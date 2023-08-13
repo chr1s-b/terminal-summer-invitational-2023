@@ -1,5 +1,6 @@
 import gamelib
 import math
+import copy
 
 
 class Attacks:
@@ -71,8 +72,8 @@ class Attacks:
                 self.do_left_attack(game_state)
             else:
                 gauntletSpawn, damageGauntlet = self.send_boosted_destroyers(game_state)
-                game_state_copy = game_state
-                game_state_copy_left = game_state
+                game_state_copy = copy.deepcopy(game_state)
+                game_state_copy_left = copy.deepcopy(game_state)
                 damageMid = self.simul_remove_mid(game_state_copy)
                 damageLeft = self.simul_remove_left(game_state_copy_left)
                 if damageMid < damageGauntlet - 10 and damageMid < damageLeft + 20 and numMP >= 12:
