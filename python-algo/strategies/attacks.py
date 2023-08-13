@@ -41,7 +41,7 @@ class Attacks:
             if(game_state.turn_number != 0):
                 self.early_scouts(game_state)
 
-        if strat_phase > middleStillOpen:
+        if strat_phase >= middleStillOpen:
             global sent_destroyers
             if self.mid_attack_next_turn:  # now it's "next turn"
                 self.do_mid_attack(game_state)
