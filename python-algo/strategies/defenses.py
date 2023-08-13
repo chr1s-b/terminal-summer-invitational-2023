@@ -37,16 +37,16 @@ class Defenses:
         phases.append([(UPGRADE, [18, 9])])
 
         # phase 3 - build middle supports and walls
+        initial_supports = [[12, 8], [13, 8]]
         wall_positions = [[26, 13], [27, 13], [7, 12], [7, 11], [7, 10], [8, 9], [0, 13], [1, 13], [2, 13], [4, 13], [5, 13]]
-        phases.append([(WALL, w_pos) for w_pos in wall_positions])
+        phases.append([(WALL, w_pos) for w_pos in wall_positions] + [support_and_upgrade for s_pos in initial_supports for support_and_upgrade in ((SUPPORT, s_pos), (UPGRADE, s_pos))])
 
         # phase 4
         phases.append([(TURRET, [21, 11]), (WALL, [21, 12]), (WALL, [22, 12])])
 
         # phase 5
-        support_positions_phase_5 = [[12, 7], [13, 7], [14, 7], [15, 7]]
         wall_positions = [[20, 11], [19, 10]] + [[x, 8] for x in range(16, 8, -1)]
-        phases.append([(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions] + [wall_and_upgrade for s_pos in support_positions_phase_5 for wall_and_upgrade in ((SUPPORT, s_pos), (UPGRADE, s_pos))])
+        phases.append([(UPGRADE, [21, 11])] + [(WALL, w_pos) for w_pos in wall_positions])
 
         # phase 6
         wall_positions = [[21, 13], [22, 13], [25, 13], [26, 12],

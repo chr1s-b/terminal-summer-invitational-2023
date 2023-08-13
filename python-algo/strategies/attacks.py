@@ -29,10 +29,6 @@ class Attacks:
         # TODO: Replace this
         middleStillOpen = 5
         numMP = math.floor(game_state.get_resource(MP))
-        if game_state.turn_number == 0:
-            game_state.attempt_spawn(SCOUT, [14, 0], 1)
-            game_state.attempt_spawn(SCOUT, [6, 7], 3)
-
         if strat_phase < middleStillOpen:
             depRight, depLeft = self.spawn_intercept(game_state)
             if depLeft[0] != 0:
@@ -42,7 +38,8 @@ class Attacks:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], 1)
             if depRight[0] != 0:
                 game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
-            self.early_scouts(game_state)
+            if(game_state.turn_number != 0):
+                self.early_scouts(game_state)
 
         if strat_phase > middleStillOpen:
             global sent_destroyers
@@ -133,7 +130,7 @@ class Attacks:
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
         numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
-        if numPosEnemyAttackers >= 8:
+        if numPosEnemyAttackers >= 4:
             enemy_edges_right = game_state.game_map.get_edge_locations(game_state.game_map.TOP_RIGHT)
             enemy_edges_left = game_state.game_map.get_edge_locations(game_state.game_map.TOP_LEFT)
             deploy_locations_right = self.filter_blocked_locations(enemy_edges_right, game_state)
