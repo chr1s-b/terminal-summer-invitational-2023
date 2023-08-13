@@ -52,7 +52,6 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         self.five_turret_complete = False
         self.strat_phase = 0
 
-        self.walls_to_replace = []
         self.scored_on_locations = []
 
     def on_turn(self, turn_state):
@@ -91,12 +90,10 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         if self.five_turret_complete:
             # Replace removed walls from last turn
             midgame_phase = self.defenses.build_midgame_defenses(game_state)
-            # Destroy damaged walls if not reserving SP    
-            for replace_location in self.walls_to_replace:
-                game_state.attempt_spawn(WALL, replace_location)
 
+            # Destroy damaged walls if not reserving SP. These should be replaced automatically  
             if self.defenses.reserved_sp == 0:
-                self.walls_to_replace = self.defenses.remove_damaged_walls(game_state) 
+                self.defenses.remove_damaged_walls(game_state) 
 
         self.defenses.reset_reserved_sp()
         self.strat_phase = phase_complete
