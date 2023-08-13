@@ -29,11 +29,12 @@ class Attacks:
         
         numMP = math.floor(game_state.get_resource(MP))
         enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
+        our_shielding_map = self.calculate_shielding_map(game_state, player_index=0)
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
-            # Spawn demolishers
-            if game_state.turn_number > 0:
-                self.spawn_early_demolishers(game_state)
+            # Spawn demolishers 
+            if game_state.turn_number > 0 and numMP_enemy <= 10:
+                self.spawn_early_demolishers(game_state, our_shielding_map)
 
             # Spawn interceptors
             depRight, depLeft = self.spawn_intercept(game_state, enemy_shielding_map)
@@ -131,6 +132,7 @@ class Attacks:
             return False
         else:
             return True
+
     
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
@@ -156,7 +158,7 @@ class Attacks:
                 for shield_location in game_state.game_map.get_locations_in_range(location, shield_range):
                     grid[shield_location[0]][shield_location[1]] += shield_strength
 
-        return grid
+        return grid        
 
     def spawn_intercept(self, game_state, enemy_shielding_map):
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
@@ -197,9 +199,46 @@ class Attacks:
                     numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                     interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
+        
+    def calculate_demolisher_damage(self, game_state, spawn_location, spawn_count, our_shielding_map):
+        # This is an estimate since it doesn't simulate the destruction of buildings
+        base_demolisher_health = 5 + our_shielding_map[spawn_location[0]][spawn_location[1]]
+        demolisher_damage = 8
+        demolisher_path = game_state.find_path_to_edge(spawn_location)
+        inflicted_damage = 0
+        num_demolishers = spawn_count
+        curr_demolisher_health = base_demolisher_health
+        for location in demolisher_path:
+            enemy_health_in_range = 0
+            for demolisher_attack_location in game_state.game_map.get_locations_in_range(location, 4.5):
+                if len(game_state.game_map[demolisher_attack_location]) > 0 and game_state.game_map[demolisher_attack_location][0].player_index == 1:
+                    enemy_health_in_range += game_state.game_map[demolisher_attack_location][0].health
+                    
+            inflicted_damage += min(enemy_health_in_range, num_demolishers * demolisher_damage) 
+
+            damage = 0
+            for unit in game_state.get_attackers(location, 0):
+                if unit.attackRange > 3.5: #seeing if upgraded or not
+                    damage += 20
+                else:
+                    damage += 8
             
-    def spawn_early_demolishers(self, game_state):
-        game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
+            curr_demolisher_health -= damage
+            if curr_demolisher_health <= 0:
+                num_demolishers -= 1
+                curr_demolisher_health = base_demolisher_health
+
+            if num_demolishers == 0:
+                break
+
+        return inflicted_damage
+            
+            
+            
+    def spawn_early_demolishers(self, game_state, our_shielding_map):
+        spawn_number = game_state.number_affordable(DEMOLISHER)
+        if(self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 20):
+            game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, spawn_number)
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)

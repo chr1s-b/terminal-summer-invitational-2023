@@ -67,7 +67,6 @@ class AlgoStrategyOne(gamelib.AlgoCore):
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
         self.utilities.track_destroyed_structures(game_state)
-        gamelib.debug_write('Destroyed structures: {}'.format(self.utilities.destroyed_structures))
         self.starter_strategy(game_state)
 
         game_state.submit_turn()

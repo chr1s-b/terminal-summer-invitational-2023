@@ -111,7 +111,7 @@ class Defenses:
                 if not unit:
                     gamelib.debug_write(f'Could not spawn {unit} at {location}.')
                     complete = False
-        gamelib.debug_write(f'build_phase returns complete={complete}')
+        # gamelib.debug_write(f'build_phase returns complete={complete}')
         return complete
 
     def build_phases(self, game_state, phases):
