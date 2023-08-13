@@ -24,13 +24,19 @@ class Attacks:
         self.left_attack_next_turn = False
         return
 
-    def attack(self, game_state, strat_phase):
-        # TODO: Replace this
+    def attack(self, game_state, strat_phase):            
         middleStillOpen = 5
+        
         numMP = math.floor(game_state.get_resource(MP))
+        enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         if strat_phase < middleStillOpen:
-            depRight, depLeft = self.spawn_intercept(game_state)
+            # Spawn demolishers
+            if game_state.turn_number > 0:
+                self.spawn_early_demolishers(game_state)
+
+            # Spawn interceptors
+            depRight, depLeft = self.spawn_intercept(game_state, enemy_shielding_map)
             if depLeft[0] != 0:
                 if numMP - depLeft[0] * 2 >= 4 and numMP_enemy >= 12:
                     game_state.attempt_spawn(INTERCEPTOR, depLeft[1], depLeft[0])
@@ -41,7 +47,8 @@ class Attacks:
                     game_state.attempt_spawn(INTERCEPTOR, depRight[1], depRight[0])
                 else:
                     game_state.attempt_spawn(INTERCEPTOR, depRight[1], 1)
-            if(game_state.turn_number != 0):
+
+            if game_state.turn_number > 0:
                 self.early_scouts(game_state)
 
         if strat_phase >= middleStillOpen:
@@ -140,10 +147,7 @@ class Attacks:
 
         return grid
 
-    def spawn_intercept(self, game_state):
-        # TODO: Change this
-        middleIsOpen = True
-        enemy_shielding_map = self.calculate_shielding_map(game_state, player_index=1)
+    def spawn_intercept(self, game_state, enemy_shielding_map):
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
         #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
         interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
@@ -182,6 +186,9 @@ class Attacks:
                     numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                     interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
+    
+    def spawn_early_demolishers(self, game_state):
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
 
     def send_boosted_destroyers(self, game_state):
         spawnLoc = self.where_spawn_dest(game_state)
