@@ -93,10 +93,10 @@ class Attacks:
             for temporary_funnel_location in temporary_funnel:
                 game_state.attempt_spawn(WALL, temporary_funnel_location)
                 game_state.attempt_remove(temporary_funnel_location)  
-        game_state.attempt_spawn(SCOUT, [14,0], 5)
+        game_state.attempt_spawn(SCOUT, [14, 0], 5)
         game_state.attempt_spawn(SCOUT, [16, 2], 20)
         return
-    
+
     def least_damage_path(self, game_state, location_options):
         damages = []
         for location in location_options:
@@ -124,7 +124,7 @@ class Attacks:
         if totalScoutHealth > minDamage:
             if numScouts <= 5:
                 game_state.attempt_spawn(SCOUT, best_location, numScouts)
-            else: 
+            else:
                 if best_location in bottom_left_locations:
                     suicide_location = (16, 2)
                 else:
@@ -138,7 +138,6 @@ class Attacks:
         else:
             return True
 
-    
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
         right_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
@@ -157,7 +156,7 @@ class Attacks:
             if len(game_state.game_map[location]) != 0 and game_state.game_map[location][0].unit_type == SUPPORT and game_state.game_map[location][0].player_index == player_index:
                 support_unit = game_state.game_map[location][0]
                 # Get y position relative to enemy
-                shield_bonus =  support_unit.shieldBonusPerY * (support_unit.y if player_index == 0 else (27 - support_unit.y)) 
+                shield_bonus = support_unit.shieldBonusPerY * (support_unit.y if player_index == 0 else (27 - support_unit.y)) 
                 shield_strength = support_unit.shieldPerUnit + shield_bonus
                 shield_range = support_unit.shieldRange
                 for shield_location in game_state.game_map.get_locations_in_range(location, shield_range):
@@ -167,8 +166,8 @@ class Attacks:
 
     def spawn_intercept(self, game_state, enemy_shielding_map):
         numMP_enemy = math.floor(game_state.get_resource(MP, player_index=1))
-        #note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
-        interceptors = [[0, [0,0]], [0, [0,0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
+        # note: doesn't incldue effects of supports yet (just assuming they're boosted by div by 6, could make 9 if know no supports)
+        interceptors = [[0, [0, 0]], [0, [0, 0]]] #[leftside (num to spawn, where to spawn), rightside (num to spawn, where to spawn)]
         numPosEnemyAttackers = game_state.get_resource(MP, player_index=1)
         if numPosEnemyAttackers >= 5:
             enemy_edges_right = game_state.game_map.get_edge_locations(game_state.game_map.TOP_RIGHT)
@@ -206,7 +205,7 @@ class Attacks:
                     numDeploy = min(2, math.floor((total_health - minDamage_right) / 6 / 4))
                     interceptors[1] = [numDeploy, SpawnPoint2]
         return interceptors
-        
+
     def calculate_demolisher_damage(self, game_state, spawn_location, spawn_count, our_shielding_map):
         # This is an estimate since it doesn't simulate the destruction of buildings
         base_demolisher_health = 5 + our_shielding_map[spawn_location[0]][spawn_location[1]]
@@ -222,7 +221,7 @@ class Attacks:
             for demolisher_attack_location in game_state.game_map.get_locations_in_range(location, 4.5):
                 if len(game_state.game_map[demolisher_attack_location]) > 0 and game_state.game_map[demolisher_attack_location][0].player_index == 1:
                     enemy_health_in_range += game_state.game_map[demolisher_attack_location][0].health
-                    
+
             inflicted_damage += min(enemy_health_in_range, num_demolishers * demolisher_damage) 
 
             damage = 0
@@ -231,7 +230,7 @@ class Attacks:
                     damage += 20
                 else:
                     damage += 8
-            
+
             curr_demolisher_health -= damage
             if curr_demolisher_health <= 0:
                 num_demolishers -= 1
@@ -241,12 +240,10 @@ class Attacks:
                 break
 
         return inflicted_damage
-            
-            
-            
+
     def spawn_early_demolishers(self, game_state, our_shielding_map):
         spawn_number = game_state.number_affordable(DEMOLISHER)
-        if(self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 20):
+        if (self.calculate_demolisher_damage(game_state, SpawnPoint3, spawn_number, our_shielding_map) > 20):
             game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, spawn_number)
 
     def send_boosted_destroyers(self, game_state):
@@ -271,7 +268,7 @@ class Attacks:
         game_state_copy.game_map.remove_unit([2, 13])
         _, minDamage = self.least_damage_path(game_state_copy, [[14, 0]])
         return minDamage
-    
+
     def scout_demo_combo(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
         spawnLoc = self.where_spawn_dest(game_state)
@@ -286,7 +283,7 @@ class Attacks:
         for path_location in path:
             # Get number of enemy turrets that can attack each location and multiply by turret damage
             for unit in game_state.get_attackers(path_location, player):
-                if unit.attackRange > 3.5: #seeing if upgraded or not
+                if unit.attackRange > 3.5:  # seeing if upgraded or not
                     damage += 20
                 else:
                     damage += 8
