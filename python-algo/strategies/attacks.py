@@ -20,8 +20,6 @@ class Attacks:
         SpawnPoint2 = [7, 6] #low-left
         SpawnPoint3 = [21, 7] #high-right
         SpawnPoint4 = [17, 3] #low-right
-        global sent_destroyers
-        sent_destroyers = False
         self.mid_attack_next_turn = False
         return
 
@@ -55,15 +53,11 @@ class Attacks:
                     game_state.attempt_remove([9,8])
                     self.mid_attack_next_turn = True
                 else:
-                    # send scout + demo combo round after sending destroyers, then revert
-                    # above heuristic can be optimized to check if sending destroyers was successful, rather than sending right after
-                    if not sent_destroyers:
-                        if numMP >= 12:
-                            game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)    
-                            sent_destroyers = True
-                    else:
+                    if self.right_side_open(game_state) and numMP >= 12:  
                         self.scout_demo_combo(game_state)
-                        sent_destroyers = False
+                    else:
+                        if numMP > 13:
+                            game_state.attempt_spawn(DEMOLISHER, gauntletSpawn, 7)
 
     def do_mid_attack(self, game_state):
         game_state.attempt_spawn(DEMOLISHER, SpawnPoint2, 1)
@@ -96,6 +90,17 @@ class Attacks:
         if totalScoutHealth > minDamage:
             game_state.attempt_spawn(SCOUT, best_location, numScouts)
 
+    def right_side_open(self, game_state):
+        locations = [[23, 14], [23, 15],[23, 16], [24, 14], [24, 15],[24, 16],[25, 14], [25, 15],[25, 16]]
+        numOccupied = 0
+        for location in locations:
+            if game_state.contains_stationary_unit(location):
+                numOccupied += 1
+        if numOccupied > 5:
+            return False
+        else:
+            return True
+    
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
         right_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
@@ -174,9 +179,9 @@ class Attacks:
         return minDamage
 
     def scout_demo_combo(self, game_state):
-        game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 1)
+        game_state.attempt_spawn(DEMOLISHER, SpawnPoint3, 2)
         spawnLoc = self.where_spawn_dest(game_state)
-        game_state.attempt_spawn(SCOUT, spawnLoc, 1)
+        game_state.attempt_spawn(SCOUT, spawnLoc, 10)
 
     def damage_during_path(self, game_state, start_location, player=0):
         path = game_state.find_path_to_edge(start_location)
