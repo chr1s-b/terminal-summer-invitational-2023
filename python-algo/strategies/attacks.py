@@ -66,7 +66,7 @@ class Attacks:
                     game_state.attempt_remove([2,13])
                     self.left_attack_next_turn = True
                 else:
-                    if self.right_side_open(game_state) and numMP >= 6:  
+                    if self.right_side_open(game_state) and numMP >= 7:  
                         self.scout_demo_combo(game_state)
                     else:
                         if numMP > 13:
